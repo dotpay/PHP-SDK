@@ -1,0 +1,6 @@
+build
+nbproject
+tests/*
+vendor
+vpproject
+composer.lock

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<objects>
+    <object class="Dotpay\Tool\Curl" alias="Curl" />
+    <object class="Dotpay\Model\Configuration" alias="Config" />
+    <object class="Dotpay\Model\Seller">
+        <param name="id" />
+        <param name="pin" />
+    </object>
+    <object class="Dotpay\Model\Customer" alias="Customer">
+        <param name="email" />
+        <param name="firstName" />
+        <param name="lastName" />
+    </object>
+    <object class="Dotpay\Model\Order" alias="Order">
+        <param name="id" />
+        <param name="amount" />
+        <param name="currency" />
+    </object>
+    <object class="Dotpay\Model\Payment" alias="PaymentModel">
+        <param name="seller" class="Dotpay\Model\Seller" />
+        <param name="customer" class="Dotpay\Model\Customer" />
+        <param name="order" class="Dotpay\Model\Order" />
+        <param name="description" />
+    </object>
+    <object class="Dotpay\Model\Transaction" alias="Transaction">
+        <param name="payment" class="Dotpay\Model\Payment" />
+    </object>
+    <object class="Dotpay\Resource\Payment" alias="PaymentResource">
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="curl" class="Dotpay\Tool\Curl" />
+    </object>
+    <object class="Dotpay\Resource\Seller" alias="SellerResource">
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="curl" class="Dotpay\Tool\Curl" />
+    </object>
+    <object class="Dotpay\Channel\Blik" alias="Blik">
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="transaction" class="Dotpay\Model\Transaction" />
+        <param name="resource" class="Dotpay\Resource\Payment" />
+    </object>
+    <object class="Dotpay\Channel\Cc" alias="Cc">
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="transaction" class="Dotpay\Model\Transaction" />
+        <param name="resource" class="Dotpay\Resource\Payment" />
+    </object>
+    <object class="Dotpay\Channel\Channel" alias="Channel">
+        <param name="channelId" />
+        <param name="code" />
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="transaction" class="Dotpay\Model\Transaction" />
+        <param name="resource" class="Dotpay\Resource\Payment" />
+    </object>
+    <object class="Dotpay\Channel\Dotpay" alias="DotpayChannel">
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="transaction" class="Dotpay\Model\Transaction" />
+        <param name="resource" class="Dotpay\Resource\Payment" />
+    </object>
+    <object class="Dotpay\Channel\Mp" alias="Mp">
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="transaction" class="Dotpay\Model\Transaction" />
+        <param name="resource" class="Dotpay\Resource\Payment" />
+    </object>
+    <object class="Dotpay\Channel\Oc" alias="Oc">
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="transaction" class="Dotpay\Model\Transaction" />
+        <param name="resource" class="Dotpay\Resource\Payment" />
+        <param name="seller" class="Dotpay\Resource\Seller" />
+    </object>
+    <object class="Dotpay\Channel\Pv" alias="Pv">
+        <param name="config" class="Dotpay\Model\Configuration" />
+        <param name="transaction" class="Dotpay\Model\Transaction" />
+        <param name="resource" class="Dotpay\Resource\Payment" />
+    </object>
+</objects>
