@@ -4,3 +4,9 @@ tests/*
 vendor
 vpproject
 composer.lock
+
+src/Dotpay/Processor/
+src/Dotpay/Storage/
+src/Dotpay/Strategy/
+src/Dotpay/Translation/
+src/dotpay.bootstrap.php

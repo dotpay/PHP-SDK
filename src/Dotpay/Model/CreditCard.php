@@ -3,7 +3,9 @@
 namespace Dotpay\Model;
 
 use Dotpay\Validator\CardMask;
+use Dotpay\Validator\Url;
 use Dotpay\Exception\BadParameter\CardMaskException;
+use Dotpay\Exception\BadParameter\UrlException;
 
 class CreditCard {
     private $id;
@@ -11,6 +13,7 @@ class CreditCard {
     private $brand;
     private $userId;
     private $cardId;
+    private $href;
 
     public function __construct($id, $userId) {
         $this->setId($id);
@@ -35,6 +38,10 @@ class CreditCard {
 
     public function getCardId() {
         return $this->cardId;
+    }
+    
+    public function getHref() {
+        return $this->href;
     }
     
     public function isRegistered() {
@@ -68,6 +75,13 @@ class CreditCard {
 
     public function setCardId($cardId) {
         $this->cardId = $cardId;
+        return $this;
+    }
+    
+    public function setHref($href) {
+        if(!Url::validate($href))
+            throw new UrlException($href);
+        $this->href = $href;
         return $this;
     }
     
