@@ -2,12 +2,17 @@
 
 namespace Dotpay\Tool;
 
+use Dotpay\Exception\ExtensionNotFoundException;
+
 class Curl {
     private $curl;
     private $info;
     private $active = 0;
     
     public function __construct() {
+		if (extension_loaded('curl') == false) {
+			throw new ExtensionNotFoundException('curl');
+		}
         $this->curl = curl_init();
         if($this->curl !== null)
             $this->active = 1;

@@ -2,11 +2,13 @@
 
 namespace Dotpay\Channel;
 
+use Dotpay\Validator\ChannelId;
 use Dotpay\Resource\Payment as PaymentResource;
 use Dotpay\Model\Payment as PaymentModel;
 use Dotpay\Model\Transaction;
 use Dotpay\Model\Configuration;
 use Dotpay\Model\Notification;
+use Dotpay\Exception\BadParameter\ChannelIdException;
 use Dotpay\Exception\Resource\Channel\NotFoundException;
 
 class Channel {
@@ -21,6 +23,8 @@ class Channel {
     protected $resource;
 
     public function __construct($channelId, $code, Configuration $config, Transaction $transaction, PaymentResource $resource) {
+        if($channelId !== null && !ChannelId::validate($channelId))
+            throw new ChannelIdException($channelId);
         $this->code = $code;
         $this->config = $config;
         $this->transaction = $transaction;

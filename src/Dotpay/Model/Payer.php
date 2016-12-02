@@ -2,10 +2,22 @@
 
 namespace Dotpay\Model;
 
+use Dotpay\Validator\Name;
+use Dotpay\Validator\Email;
+use Dotpay\Exception\BadParameter\FirstnameException;
+use Dotpay\Exception\BadParameter\LastnameException;
+use Dotpay\Exception\BadParameter\EmailException;
+
 class Payer {
     private $firstName;
     private $lastName;
     private $email;
+    
+    public function __construct($email, $firstName, $lastName) {
+        $this->setEmail($email);
+        $this->setFirstName($firstName);
+        $this->setLastName($lastName);
+    }
     
     public function getFirstName() {
         return $this->firstName;

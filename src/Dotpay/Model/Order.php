@@ -11,7 +11,7 @@ class Order {
     private $currency;
     private $reference;
 
-    const CURRENCIES = Configuration::currencies;
+    const CURRENCIES = Configuration::CURRENCIES;
     
     public function __construct($id, $amount, $currency) {
         $this->setId($id);

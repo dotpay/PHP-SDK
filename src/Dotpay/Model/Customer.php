@@ -4,14 +4,10 @@ namespace Dotpay\Model;
 
 use Dotpay\Validator\Name;
 use Dotpay\Validator\Street;
-use Dotpay\Validator\Email;
 use Dotpay\Validator\BNumber;
 use Dotpay\Validator\PostCode;
 use Dotpay\Validator\Phone;
 use Dotpay\Exception\BadParameter\LanguageException;
-use Dotpay\Exception\BadParameter\FirstnameException;
-use Dotpay\Exception\BadParameter\LastnameException;
-use Dotpay\Exception\BadParameter\EmailException;
 use Dotpay\Exception\BadParameter\StreetException;
 use Dotpay\Exception\BadParameter\BNumberException;
 use Dotpay\Exception\BadParameter\PostCodeException;
@@ -19,11 +15,8 @@ use Dotpay\Exception\BadParameter\CityException;
 use Dotpay\Exception\BadParameter\CountryException;
 use Dotpay\Exception\BadParameter\PhoneException;
 
-class Customer {
+class Customer extends Payer {
     private $id;
-    private $firstName;
-    private $lastName;
-    private $email;
     private $street;
     private $buildingNumber;
     private $postCode;
@@ -44,26 +37,8 @@ class Customer {
         'bg'
     );
     
-    public function __construct($email, $firstName, $lastName) {
-        $this->setEmail($email);
-        $this->setFirstName($firstName);
-        $this->setLastName($lastName);
-    }
-    
     public function getId() {
         return $this->id;
-    }
-
-    public function getFirstName() {
-        return $this->firstName;
-    }
-
-    public function getLastName() {
-        return $this->lastName;
-    }
-
-    public function getEmail() {
-        return $this->email;
     }
 
     public function getStreet() {
@@ -98,27 +73,6 @@ class Customer {
 
     public function setId($id) {
         $this->id = $id;
-        return $this;
-    }
-
-    public function setFirstName($firstName) {
-        if(!Name::validate($firstName))
-            throw new FirstnameException($firstName);
-        $this->firstName = $firstName;
-        return $this;
-    }
-
-    public function setLastName($lastName) {
-        if(!Name::validate($lastName))
-            throw new LastnameException($lastName);
-        $this->lastName = $lastName;
-        return $this;
-    }
-
-    public function setEmail($email) {
-        if(!Email::validate($email))
-            throw new EmailException($email);
-        $this->email = $email;
         return $this;
     }
 

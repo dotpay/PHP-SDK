@@ -1,16 +1,17 @@
 <?php
 
-namespace Dotpay\Resource\Model;
+namespace Dotpay\Model;
 
 use Dotpay\Validator\BankNumber;
+use Dotpay\Exception\BadParameter\BankNumberException;
 
 class BankAccount {
     private $name;
     private $number;
     
     public function __construct($name = null, $number = null) {
-        $this->name = $name;
-        $this->number = $number;
+        $this->setName($name);
+        $this->setNumber($number);
     }
     
     public function getName() {
@@ -27,8 +28,8 @@ class BankAccount {
     }
 
     public function setNumber($number) {
-        if($number !== null && !CardMask::validate($mask))
-            throw new CardMaskException($mask);
+        if($number !== null && !BankNumber::validate($number))
+            throw new BankNumberException($number);
         $this->number = $number;
         return $this;
     }

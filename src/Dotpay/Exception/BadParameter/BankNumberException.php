@@ -2,7 +2,7 @@
 
 namespace Dotpay\Exception\BadParameter;
 
-class UrlException extends \InvalidArgumentException {
+class BankNumberException extends \InvalidArgumentException {
 
 }
 

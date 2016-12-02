@@ -28,7 +28,7 @@ class Payment extends Resource {
     private function getUrl(ModelPayment $payment) {
         $lang = $payment->getCustomer()->getLanguage();
         if(!$lang)
-            $lang = 'fr';
+            $lang = 'en';
         return $this->config->getPaymentUrl().'payment_api/channels/'.
                '?id='.$payment->getSeller()->getId().
                '&amount='.$payment->getOrder()->getAmount().

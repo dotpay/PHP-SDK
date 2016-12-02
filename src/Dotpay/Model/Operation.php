@@ -1,16 +1,22 @@
 <?php
 
-namespace Dotpay\Resource\Model;
+namespace Dotpay\Model;
 
+use \DateTime;
 use Dotpay\Model\Configuration;
+use Dotpay\Validator\OpNumber;
 use Dotpay\Validator\Url;
 use Dotpay\Validator\Id;
-use Dotpay\Exception\BadParameter\UrlExceptionException;
+use Dotpay\Validator\Amount;
+use Dotpay\Exception\BadParameter\UrlException;
+use Dotpay\Exception\BadParameter\OperationNumberException;
 use Dotpay\Exception\BadParameter\IdException;
 use Dotpay\Exception\BadParameter\AmountException;
 use Dotpay\Exception\BadParameter\CurrencyException;
+use Dotpay\Exception\BadParameter\OperationTypeException;
+use Dotpay\Exception\BadParameter\OperationStatusException;
 
-class Payment {
+class Operation {
     private $url;
     private $number;
     private $creationTime;
@@ -27,9 +33,23 @@ class Payment {
     private $payer;
     private $paymentMethod;
     
+    public static $types = [
+        'payment',
+        'refund'
+    ];
+    
+    public static $statuses = [
+        'new',
+        'processing',
+        'completed',
+        'rejected',
+        'processing_realization_waiting',
+        'processing_realization'
+    ];
+    
     public function __construct($type, $number) {
-        $this->type = $type;
-        $this->number = $number;
+        $this->setType($type);
+        $this->setNumber($number);
     }
     
     public function getUrl() {
@@ -94,33 +114,39 @@ class Payment {
 
     public function setUrl($url) {
         if(!Url::validate($url))
-            throw new UrlExceptionException($url);
+            throw new UrlException($url);
         $this->url = $url;
         return $this;
     }
 
     public function setNumber($number) {
+        if(!OpNumber::validate($number))
+            throw new OperationNumberException($number);
         $this->number = $number;
         return $this;
     }
 
-    public function setCreationTime($creationTime) {
+    public function setCreationTime(DateTime $creationTime) {
         $this->creationTime = $creationTime;
         return $this;
     }
 
     public function setType($type) {
+        if(array_search($type, self::$types) === false)
+            throw new OperationTypeException($type);
         $this->type = $type;
         return $this;
     }
 
     public function setStatus($status) {
+        if(array_search($status, self::$statuses) === false)
+            throw new OperationStatusException($status);
         $this->status = $status;
         return $this;
     }
 
     public function setAmount($amount) {
-        if(empty($amount))
+        if(!Amount::validate($amount))
             throw new AmountException($amount);
         $this->amount = $amount;
         return $this;
@@ -138,25 +164,27 @@ class Payment {
         $originalCurrency = strtoupper($originalCurrency);
         if(!in_array($originalCurrency, Configuration::CURRENCIES))
             throw new CurrencyException($originalCurrency);
-        $this->originalCurrenc = $originalCurrency;
+        $this->originalCurrency = $originalCurrency;
         return $this;
     }
 
     public function setOriginalAmount($originalAmount) {
-        if(empty($originalAmount))
+        if(!Amount::validate($originalAmount))
             throw new AmountException($originalAmount);
         $this->originalAmount = $originalAmount;
         return $this;
     }
 
     public function setAccountId($accountId) {
-        if(!Id::validate($url))
-            throw new IdException($url);
+        if(!Id::validate($accountId))
+            throw new IdException($accountId);
         $this->accountId = $accountId;
         return $this;
     }
 
     public function setRelatedOperation($relatedOperation) {
+        if(!OpNumber::validate($relatedOperation))
+            throw new OperationNumberException($relatedOperation);
         $this->relatedOperation = $relatedOperation;
         return $this;
     }

@@ -31,7 +31,7 @@ class Configuration {
     
     const widgetClassContainer = 'dotpay-widget-container';
     
-    const currencies = array(
+    const CURRENCIES = array(
         'EUR',
         'USD',
         'GBP',
@@ -174,7 +174,7 @@ class Configuration {
     }
     
     public function isGatewayEnabled($currency) {
-        return $this->isCurrencyOnList($currency, implode(',', self::currencies));
+        return $this->isCurrencyOnList($currency, implode(',', self::CURRENCIES));
     }
     
     public function isCurrencyForPv($currency) {
