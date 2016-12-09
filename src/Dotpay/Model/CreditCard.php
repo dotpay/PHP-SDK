@@ -56,7 +56,7 @@ class CreditCard {
     }
 
     public function setMask($mask) {
-        $mask = strtoupper($mask);
+        $mask = str_replace(' ', '-', strtoupper($mask));
         if(!CardMask::validate($mask))
             throw new CardMaskException($mask);
         $this->mask = $mask;

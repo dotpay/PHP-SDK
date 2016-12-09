@@ -21,7 +21,7 @@ class Configuration {
     const localIp = '127.0.0.1';
     
     const ocChannel = 248;
-    const pvChannel = 248;
+    const fccChannel = 248;
     const ccChannel = 246;
     const mpChannel = 71;
     const blikChannel = 73;
@@ -48,10 +48,10 @@ class Configuration {
     private $password;
     private $testMode;
     private $ocVisible;
-    private $pvVisible;
-    private $pvId;
-    private $pvPin;
-    private $pvCurrencies;
+    private $fccVisible;
+    private $fccId;
+    private $fccPin;
+    private $fccCurrencies;
     private $ccVisible;
     private $mpVisible;
     private $blikVisible;
@@ -104,27 +104,27 @@ class Configuration {
                  empty($this->password));
     }
 
-    public function getPvVisible() {
-        return $this->pvVisible;
+    public function getFccVisible() {
+        return $this->fccVisible;
     }
 
-    public function getPvId() {
-        return $this->pvId;
+    public function getFccId() {
+        return $this->fccId;
     }
 
-    public function getPvPin() {
-        return $this->pvPin;
+    public function getFccPin() {
+        return $this->fccPin;
     }
 
-    public function getPvCurrencies() {
-        return $this->pvCurrencies;
+    public function getFccCurrencies() {
+        return $this->fccCurrencies;
     }
     
-    public function isPvEnable() {
-        return $this->getPvVisible() && 
-               !(empty($this->pvId) && 
-                 empty($this->pvPin) && 
-                 empty($this->pvCurrencies));
+    public function isFccEnable() {
+        return $this->getFccVisible() && 
+               !(empty($this->fccId) && 
+                 empty($this->fccPin) && 
+                 empty($this->fccCurrencies));
     }
 
     public function getCcVisible() {
@@ -177,8 +177,8 @@ class Configuration {
         return $this->isCurrencyOnList($currency, implode(',', self::CURRENCIES));
     }
     
-    public function isCurrencyForPv($currency) {
-        return $this->isCurrencyOnList($currency, $this->getPvCurrencies());
+    public function isCurrencyForFcc($currency) {
+        return $this->isCurrencyOnList($currency, $this->getFccCurrencies());
     }
     
     public function isWidgetEnabled($currency) {
@@ -237,27 +237,27 @@ class Configuration {
         return $this;
     }
 
-    public function setPvVisible($pvVisible) {
-        $this->pvVisible = (bool)$pvVisible;
+    public function setFccVisible($pvVisible) {
+        $this->fccVisible = (bool)$pvVisible;
         return $this;
     }
 
-    public function setPvId($pvId) {
+    public function setFccId($pvId) {
         if(!Id::validate($pvId))
             throw new IdException($pvId);
-        $this->pvId = $pvId;
+        $this->fccId = $pvId;
         return $this;
     }
 
-    public function setPvPin($pvPin) {
+    public function setFccPin($pvPin) {
         if(!Pin::validate($pvPin))
             throw new PinException($pvPin);
-        $this->pvPin = $pvPin;
+        $this->fccPin = $pvPin;
         return $this;
     }
 
-    public function setPvCurrencies($pvCurrencies) {
-        $this->pvCurrencies = strtoupper($pvCurrencies);
+    public function setFccCurrencies($pvCurrencies) {
+        $this->fccCurrencies = strtoupper($pvCurrencies);
         return $this;
     }
 
@@ -311,10 +311,10 @@ class Configuration {
         $this->password = '';
         $this->testMode = false;
         $this->ocVisible = false;
-        $this->pvVisible = false;
-        $this->pvId = '';
-        $this->pvPin = '';
-        $this->pvCurrencies = '';
+        $this->fccVisible = false;
+        $this->fccId = '';
+        $this->fccPin = '';
+        $this->fccCurrencies = '';
         $this->ccVisible = false;
         $this->mpVisible = false;
         $this->blikVisible = false;

@@ -10,8 +10,6 @@ class Order {
     private $amount;
     private $currency;
     private $reference;
-
-    const CURRENCIES = Configuration::CURRENCIES;
     
     public function __construct($id, $amount, $currency) {
         $this->setId($id);
@@ -30,7 +28,7 @@ class Order {
     public function getCurrency() {
         return $this->currency;
     }
-
+    
     public function getReference() {
         return $this->reference;
     }
@@ -49,7 +47,7 @@ class Order {
 
     public function setCurrency($currency) {
         $currency = strtoupper($currency);
-        if(!in_array($currency, self::CURRENCIES))
+        if(!in_array($currency, Configuration::CURRENCIES))
             throw new CurrencyException($currency);
         $this->currency = $currency;
         return $this;

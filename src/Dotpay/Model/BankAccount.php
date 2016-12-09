@@ -23,13 +23,17 @@ class BankAccount {
     }
 
     public function setName($name) {
+        if(empty($name))
+            $name = null;
         $this->name = $name;
         return $this;
     }
 
     public function setNumber($number) {
-        if($number !== null && !BankNumber::validate($number))
+        if(!empty($number) && !BankNumber::validate($number))
             throw new BankNumberException($number);
+        if(empty($number))
+            $number = null;
         $this->number = $number;
         return $this;
     }

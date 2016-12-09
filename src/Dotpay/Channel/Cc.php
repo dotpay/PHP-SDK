@@ -15,8 +15,8 @@ class Cc extends Channel {
     
     public function getVisibility() {
         return $this->config->getCcVisible() && 
-               !($this->config->getPvCorrect() || 
-                 $this->config->isCurrencyForPv(
+               !($this->config->getFccCorrect() || 
+                 $this->config->isCurrencyForFcc(
                     $this->transaction->getPayment()->getOrder()->getCurrency()
                  ));
     }

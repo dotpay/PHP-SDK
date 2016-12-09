@@ -2,22 +2,33 @@
 
 namespace Dotpay\Resource;
 
-use Dotpay\Model\Payment as PaymentModel;
 use Dotpay\Model\Configuration;
 use Dotpay\Tool\Curl;
-use Dotpay\Exception\Resource\ApiException;
+use Dotpay\Model\Account;
+use Dotpay\Model\BankAccount;
+use Dotpay\Model\Operation;
+use Dotpay\Model\Payer;
+use Dotpay\Model\PaymentMethod;
+use Dotpay\Model\CreditCard;
+use Dotpay\Model\CardBrand;
+use Dotpay\Model\Payout;
+use Dotpay\Model\Seller as SellerModel;
+use Dotpay\Exception\Resource\UnauthorizedException;
 use Dotpay\Exception\BadReturn\TypeNotCompatibleException;
+use Dotpay\Exception\Resource\NotFoundException as ResourceNotFoundException;
+use Dotpay\Exception\Resource\Account\NotFoundException as AccountNotFoundException;
+use Dotpay\Exception\Resource\Operation\NotFoundException as OperationNotFoundException;
 
 class Seller extends Resource {
     public function __construct(Configuration $config, Curl $curl) {
         parent::__construct($config, $curl);
         $this->curl->addOption(CURLOPT_USERPWD, $this->config->getUsername().':'.$this->config->getPassword());
     }
-
+    
     public function isAccountRight() {
         try {
             $this->getDataFromApi('payments/');
-        } catch (ApiException $e) {
+        } catch (UnauthorizedException $e) {
             return false;
         }
         return true;
@@ -27,27 +38,113 @@ class Seller extends Resource {
         return $this->checkIdAndPin($this->config->getId(), $this->config->getPin());
     }
     
-    public function checkPvPin() {
-        return $this->checkIdAndPin($this->config->getPvId(), $this->config->getPvPin());
+    public function checkFccPin() {
+        return $this->checkIdAndPin($this->config->getFccId(), $this->config->getFccPin());
     }
     
-    public function getPaymentByNumber($number) {
-        
+    public function getAccount($id) {
+        try {
+            $response = $this->getDataFromApi('accounts/'.$id.'/?format=json');
+        } catch (ResourceNotFoundException $ex) {
+            throw new AccountNotFoundException($id);
+        }
+        $account = new Account($response['id']);
+        $account->setStatus($response['status'])
+                ->setName($response['name'])
+                ->setMcc($response['mcc_code'])
+                ->setUrlc($response['config']['urlc'])
+                ->setBlockExternalUrlc($response['config']['block_external_urlc'])
+                ->setPin($response['config']['pin']);
+        return $account;
     }
     
-    public function getPaymentById($id) {
-        
+    public function getOperationByNumber($number) {
+        try {
+            $response = $this->getDataFromApi('operations/'.$number.'/?format=json');
+            return $this->getWrapedOperation($response);
+        } catch (ResourceNotFoundException $ex) {
+            throw new OperationNotFoundException($number);
+        }
     }
     
-    public function makeRefund(PaymentModel $payment, $amount, $description) {
-        
+    public function getOperationById($id) {
+        try {
+            foreach($this->getPaginateDataFromApi('operations/?control='.$id.'&format=json') as $operation) {
+                if($operation['control'] === $id)
+                    return $this->getWrapedOperation($operation);
+            }
+        } catch (ResourceNotFoundException $ex) {
+            throw new OperationNotFoundException($id);
+        }
+        throw new OperationNotFoundException($id);
+    }
+    
+    public function makePayout(SellerModel $seller, Payout $payout) {
+        $data = $this->getDataForPayout($seller, $payout);
+        try {
+            $this->postData('accounts/'.$seller->getId().'/payout/?format=json', json_encode($data));
+            return true;
+        } catch (ResourceNotFoundException $ex) {
+            throw new AccountNotFoundException($seller->getId());
+        }
+    }
+    
+    private function getDataForPayout(SellerModel $seller, Payout $payout) {
+        $data = [
+            'currency' => $payout->getCurrency(),
+            'transfers' => []
+        ];
+        foreach ($payout->getTransfers() as $transfer) {
+            $data['transfers'][] = [
+                'amount' => $transfer->getAmount(),
+                'control' => $transfer->getControl(),
+                'description' => $transfer->getDescription(),
+                'recipient' => [
+                    'name' => $transfer->getRecipient()->getName(),
+                    'account_number' => $transfer->getRecipient()->getNumber()
+                ],
+            ];
+        }
+        return $data;
+    }
+    
+    private function getWrapedOperation($input) {
+        $operation = new Operation($input['type'], $input['number']);
+            $operation->setUrl($input['href'])
+                      ->setCreationTime(new \DateTime($input['creation_datetime']))
+                      ->setStatus($input['status'])
+                      ->setAmount($input['amount'])
+                      ->setCurrency($input['currency'])
+                      ->setOriginalAmount($input['original_amount'])
+                      ->setOriginalCurrency($input['original_currency'])
+                      ->setAccountId($input['account_id'])
+                      ->setDescription($input['description'])
+                      ->setControl($input['control'])
+                      ->setPayer(new Payer($input['payer']['email'], $input['payer']['first_name'], $input['payer']['last_name']));
+            if($input['related_operation'] != null)
+                $operation->setRelatedOperation($input['related_operation']);
+            if(isset($input['payment_method'])) {
+                if(isset($input['payment_method']['payer_bank_account'])) {
+                    $bank = $input['payment_method']['payer_bank_account'];
+                    $details = new BankAccount($bank['name'], $bank['number']);
+                    $type = PaymentMethod::BANK_ACCOUNT;
+                } else if(isset($input['payment_method']['credit_card'])) {
+                    $cc = $input['payment_method']['credit_card'];
+                    $details = new CreditCard(null, null);
+                    $details->setBrand(new CardBrand($cc['brand']['name'], $cc['brand']['logo'], $cc['brand']['codename']))
+                            ->setCardId($cc['id'])
+                            ->setMask($cc['masked_number'])
+                            ->setHref($cc['href']);
+                    $type = PaymentMethod::CREDIT_CARD;
+                }
+                $operation->setPaymentMethod(new PaymentMethod($input['payment_method']['channel_id'], $details, $type));
+            }
+            return $operation;
     }
     
     private function checkIdAndPin($id, $pin) {
-        $response = $this->getDataFromApi('account/'.$id);
-        if(isset($response['config']) &&
-           isset($response['config']['pin']) &&
-           $response['config']['pin'] == $pin) {
+        $account = $this->getAccount($id);
+        if($account->getId() === $id && $account->getPin() === $pin) {
             return true;
         }
         else {
@@ -55,18 +152,44 @@ class Seller extends Resource {
         }
     }
     
+    private function getPaginateDataFromApi($fullUrl) {
+        $this->curl->addOption(CURLOPT_USERPWD, $this->config->getUsername().':'.$this->config->getPassword());
+        $content = $this->getContent($fullUrl);
+        if(!is_array($content))
+            throw new TypeNotCompatibleException(gettype($content));
+        $info = $this->curl->getInfo();
+        if(isset($info['http_code']) && $info['http_code'] == 400) {
+            reset($content);
+            throw new ApiException($content[key($info)]);
+        }
+        if($content['next'] === null) {
+            return $content['results'];
+        } else {
+            return array_merge($content['results'], $this->getPaginateDataFromApi($content['next']));
+        }
+    }
+    
     private function getDataFromApi($targetUrl) {
+        $this->curl->addOption(CURLOPT_USERPWD, $this->config->getUsername().':'.$this->config->getPassword());
         $content = $this->getContent($this->getApiUrl($targetUrl));
         if(!is_array($content))
             throw new TypeNotCompatibleException(gettype($content));
-        if(isset($content['error_code'])) {
-            $exception = new ApiException($content['detail']);
-            throw $exception->setApiCode($content['error_code']);
+        $info = $this->curl->getInfo();
+        if(isset($info['http_code']) && $info['http_code'] == 400) {
+            reset($content);
+            throw new ApiException($content[key($info)]);
         }
         return $content;
     }
     
+    private function postData($url, $body) {
+        $this->curl->addOption(CURLOPT_POST, 1)
+                   ->addOption(CURLOPT_POSTFIELDS, $body)
+                   ->addOption(CURLOPT_USERPWD, $this->config->getUsername().':'.$this->config->getPassword());
+        return $this->getContent($url);
+    }
+    
     private function getApiUrl($end) {
-        return $this->config->getPaymentUrl().'api/'.$end;
+        return $this->config->getSellerUrl().'api/'.$end;
     }
 }

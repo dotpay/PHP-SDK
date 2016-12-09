@@ -8,10 +8,15 @@ use Dotpay\Exception\BadParameter\ChannelIdException;
 class PaymentMethod {
     private $channelId;
     private $details;
+    private $detailsType;
     
-    public function __construct($channelId, $details) {
+    const BANK_ACCOUNT = 1;
+    const CREDIT_CARD = 2;
+    
+    public function __construct($channelId, $details, $detailsType = null) {
         $this->setChannelId($channelId);
         $this->setDetails($details);
+        $this->setDetailsType($detailsType);
     }
     
     public function getChannelId() {
@@ -20,6 +25,10 @@ class PaymentMethod {
 
     public function getDetails() {
         return $this->details;
+    }
+    
+    public function getDetailsType() {
+        return $this->detailsType;
     }
 
     public function setChannelId($channelId) {
@@ -31,6 +40,11 @@ class PaymentMethod {
 
     public function setDetails($details) {
         $this->details = $details;
+        return $this;
+    }
+    
+    public function setDetailsType($type) {
+        $this->detailsType = $type;
         return $this;
     }
 }

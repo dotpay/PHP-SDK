@@ -6,21 +6,21 @@ use Dotpay\Model\Configuration;
 use Dotpay\Model\Transaction;
 use Dotpay\Resource\Payment as PaymentResource;
 
-class Pv extends Channel {
+class Fcc extends Channel {
     public function __construct(Configuration $config, Transaction $transaction, PaymentResource $paymentResource) {
-        parent::__construct(Configuration::pvChannel, 'pv', $config, $transaction, $paymentResource);
+        parent::__construct(Configuration::fccChannel, 'fcc', $config, $transaction, $paymentResource);
     }
     
     public function getVisibility() {
-        return $this->config->isPvEnable() && 
-               $this->config->isCurrencyForPv(
+        return $this->config->isFccEnable() && 
+               $this->config->isCurrencyForFcc(
                     $this->transaction->getPayment()->getOrder()->getCurrency()
                );
     }
     
     public function getHiddenFields() {
         $data = parent::getHiddenFields();
-        $data['id'] = $this->config->getPvId();
+        $data['id'] = $this->config->getFccId();
         return $data;
     }
 }

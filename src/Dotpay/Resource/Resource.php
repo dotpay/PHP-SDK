@@ -6,6 +6,7 @@ use Dotpay\Model\Configuration;
 use Dotpay\Tool\Curl;
 use Dotpay\Exception\Resource\ServerException;
 use Dotpay\Exception\Resource\ForbiddenException;
+use Dotpay\Exception\Resource\UnauthorizedException;
 use Dotpay\Exception\Resource\NotFoundException;
 
 abstract class Resource {
@@ -26,12 +27,20 @@ abstract class Resource {
     
     protected function getContent($url) {
         $this->curl->addOption(CURLOPT_URL, $url);
+        $headers = [
+            'Accept' => 'application/xml',
+            'Content-Type' => 'application/xml'
+        ];
+        $this->curl->addOption(CURLOPT_HTTPHEADER, $headers);
         $result = $this->curl->exec();
         $info = $this->curl->getInfo();
         $httpCode = (int)$info['http_code'];
         if($httpCode >= 200 && $httpCode < 300 || $httpCode == 400)
             return json_decode($result, true);
         switch($httpCode) {
+            case 401:
+                throw new UnauthorizedException($url);
+                break;
             case 403:
                 throw new ForbiddenException($url);
                 break;

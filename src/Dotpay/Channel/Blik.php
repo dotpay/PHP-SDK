@@ -23,7 +23,7 @@ class Blik extends Channel {
     public function getBlikCode() {
         return $this->blikCode;
     }
-
+    
     public function setBlikCode($blikCode) {
         if(!BlikCode::validate($blikCode))
             throw new BlikCodeException($blikCode);
