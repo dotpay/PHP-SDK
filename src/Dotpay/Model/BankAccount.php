@@ -30,6 +30,8 @@ class BankAccount {
     }
 
     public function setNumber($number) {
+        if(preg_match('/^\d{26}$/', trim($number)) === 1)
+            $number = 'PL'.$number;
         if(!empty($number) && !BankNumber::validate($number))
             throw new BankNumberException($number);
         if(empty($number))

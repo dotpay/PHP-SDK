@@ -11,6 +11,8 @@ use Dotpay\Exception\BadParameter\UsernameException;
 use Dotpay\Exception\BadParameter\ApiVersionException;
 
 class Configuration {
+    const sdkVersion = '0.1';
+    
     const paymentUrlProd = 'https://ssl.dotpay.pl/t2/';
     const paymentUrlDev = 'https://ssl.dotpay.pl/test_payment/';
     const sellerUrlProd = 'https://ssl.dotpay.pl/s2/login/';
@@ -26,8 +28,8 @@ class Configuration {
     const mpChannel = 71;
     const blikChannel = 73;
     
-    const cashGroup = '';
-    const transferGroup = '';
+    const cashGroup = 'cash';
+    const transferGroup = 'transfers';
     
     const widgetClassContainer = 'dotpay-widget-container';
     

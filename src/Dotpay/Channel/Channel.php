@@ -53,6 +53,12 @@ class Channel {
         else return null;
     }
     
+    public function getGroup() {
+        if($this->channelInfo !== null)
+            return $this->channelInfo->getGroup();
+        else return null;
+    }
+    
     public function getLogo() {
         if($this->channelInfo !== null)
             return $this->channelInfo->getLogo();

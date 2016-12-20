@@ -13,7 +13,7 @@ class PaymentMethod {
     const BANK_ACCOUNT = 1;
     const CREDIT_CARD = 2;
     
-    public function __construct($channelId, $details, $detailsType = null) {
+    public function __construct($channelId, $details = null, $detailsType = null) {
         $this->setChannelId($channelId);
         $this->setDetails($details);
         $this->setDetailsType($detailsType);

@@ -8,6 +8,8 @@ use Dotpay\Exception\Resource\ServerException;
 use Dotpay\Exception\Resource\ForbiddenException;
 use Dotpay\Exception\Resource\UnauthorizedException;
 use Dotpay\Exception\Resource\NotFoundException;
+use Dotpay\Exception\Resource\UnavailableException;
+use Dotpay\Exception\Resource\TimeoutException;
 
 abstract class Resource {
     protected $config;
@@ -28,8 +30,8 @@ abstract class Resource {
     protected function getContent($url) {
         $this->curl->addOption(CURLOPT_URL, $url);
         $headers = [
-            'Accept' => 'application/xml',
-            'Content-Type' => 'application/xml'
+            'Accept' => 'application/json; indent=4',
+            'Content-Type' => 'application/json'
         ];
         $this->curl->addOption(CURLOPT_HTTPHEADER, $headers);
         $result = $this->curl->exec();
@@ -47,9 +49,22 @@ abstract class Resource {
             case 404:
                 throw new NotFoundException($url);
                 break;
+            case 503:
+                throw new UnavailableException($url);
+                break;
+            case 504:
+                throw new TimeoutException($url);
+                break;
             default:
                 throw new ServerException($this->curl->error(), $httpCode);
         }
+    }
+    
+    protected function postData($url, $body) {
+        $this->curl->addOption(CURLOPT_POST, 1)
+                   ->addOption(CURLOPT_POSTFIELDS, $body)
+                   ->addOption(CURLOPT_USERPWD, $this->config->getUsername().':'.$this->config->getPassword());
+        return $this->getContent($url);
     }
 }
 

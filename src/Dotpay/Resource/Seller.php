@@ -13,7 +13,10 @@ use Dotpay\Model\CreditCard;
 use Dotpay\Model\CardBrand;
 use Dotpay\Model\Payout;
 use Dotpay\Model\Seller as SellerModel;
+use Dotpay\Validator\OpNumber;
+use Dotpay\Exception\BadParameter\OperationNumberException;
 use Dotpay\Exception\Resource\UnauthorizedException;
+use Dotpay\Exception\Resource\ApiException;
 use Dotpay\Exception\BadReturn\TypeNotCompatibleException;
 use Dotpay\Exception\Resource\NotFoundException as ResourceNotFoundException;
 use Dotpay\Exception\Resource\Account\NotFoundException as AccountNotFoundException;
@@ -59,6 +62,8 @@ class Seller extends Resource {
     }
     
     public function getOperationByNumber($number) {
+        if(!OpNumber::validate($number))
+            throw new OperationNumberException($number);
         try {
             $response = $this->getDataFromApi('operations/'.$number.'/?format=json');
             return $this->getWrapedOperation($response);
@@ -160,7 +165,7 @@ class Seller extends Resource {
         $info = $this->curl->getInfo();
         if(isset($info['http_code']) && $info['http_code'] == 400) {
             reset($content);
-            throw new ApiException($content[key($info)]);
+            throw new ApiException($content[key($content)]);
         }
         if($content['next'] === null) {
             return $content['results'];
@@ -177,16 +182,9 @@ class Seller extends Resource {
         $info = $this->curl->getInfo();
         if(isset($info['http_code']) && $info['http_code'] == 400) {
             reset($content);
-            throw new ApiException($content[key($info)]);
+            throw new ApiException($content[key($content)]);
         }
         return $content;
-    }
-    
-    private function postData($url, $body) {
-        $this->curl->addOption(CURLOPT_POST, 1)
-                   ->addOption(CURLOPT_POSTFIELDS, $body)
-                   ->addOption(CURLOPT_USERPWD, $this->config->getUsername().':'.$this->config->getPassword());
-        return $this->getContent($url);
     }
     
     private function getApiUrl($end) {

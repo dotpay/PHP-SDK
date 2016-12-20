@@ -24,6 +24,10 @@
     <filter>
         <whitelist>
             <directory suffix=".php">src/</directory>
+            <exclude>
+                <directory suffix="IBAN.php">src/Dotpay/Tool/</directory>
+				<directory suffix="dotpay.bootstrap.php">src/</directory>
+            </exclude>
         </whitelist>
     </filter>
     <logging>
@@ -32,6 +36,6 @@
         <log type="coverage-html" target="build/coverage" charset="UTF-8" yui="true" highlight="true"/>
         <log type="coverage-text" target="build/coverage.txt"/>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
-		<log type="coverage-php" target="/tmp/coverage.humbug.php"/>
+        <log type="coverage-php" target="/tmp/coverage.humbug.php"/>
     </logging>
 </phpunit>

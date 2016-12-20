@@ -50,7 +50,7 @@ class IBAN
         $this->bban        = strtoupper($bban);
         $this->validateSelf();
     }
-
+    
     public static function createFromString($accountNumber)
     {
         $min = min(static::$IBANLengths) - 4; // first 4 are <country><check>
