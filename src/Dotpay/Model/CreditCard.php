@@ -13,9 +13,10 @@ class CreditCard {
     private $brand;
     private $userId;
     private $cardId;
+    private $issuerId;
     private $href;
 
-    public function __construct($id, $userId) {
+    public function __construct($id = null, $userId = null) {
         $this->setId($id);
         $this->setUserId($userId);
     }
@@ -38,6 +39,10 @@ class CreditCard {
 
     public function getCardId() {
         return $this->cardId;
+    }
+    
+    public function getIssuerId() {
+        return $this->issuerId;
     }
     
     public function getHref() {
@@ -75,6 +80,11 @@ class CreditCard {
 
     public function setCardId($cardId) {
         $this->cardId = $cardId;
+        return $this;
+    }
+    
+    public function setIssuerId($issuerId) {
+        $this->issuerId = $issuerId;
         return $this;
     }
     

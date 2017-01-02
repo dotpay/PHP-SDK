@@ -19,13 +19,15 @@ use Dotpay\Exception\BadParameter\OperationStatusException;
 class Operation {
     private $url;
     private $number;
-    private $creationTime;
+    private $dateTime;
     private $type;
     private $status;
     private $amount;
     private $currency;
     private $originalCurrency;
     private $originalAmount;
+    private $withdrawalAmount;
+    private $commissionAmount;
     private $accountId;
     private $relatedOperation;
     private $description;
@@ -35,7 +37,13 @@ class Operation {
     
     public static $types = [
         'payment',
-        'refund'
+        'refund',
+        'payment_multimerchant_child',
+        'payment_multimerchant_parent',
+        'payout',
+        'release_rollback',
+        'unidentified_payment',
+        'complaint'
     ];
     
     public static $statuses = [
@@ -60,8 +68,8 @@ class Operation {
         return $this->number;
     }
 
-    public function getCreationTime() {
-        return $this->creationTime;
+    public function getDateTime() {
+        return $this->dateTime;
     }
 
     public function getType() {
@@ -86,6 +94,14 @@ class Operation {
 
     public function getOriginalAmount() {
         return $this->originalAmount;
+    }
+    
+    public function getWithdrawalAmount() {
+        return $this->withdrawalAmount;
+    }
+    
+    public function getCommissionAmount() {
+        return $this->commissionAmount;
     }
 
     public function getAccountId() {
@@ -126,8 +142,8 @@ class Operation {
         return $this;
     }
 
-    public function setCreationTime(DateTime $creationTime) {
-        $this->creationTime = $creationTime;
+    public function setDateTime(DateTime $dateTime) {
+        $this->dateTime = $dateTime;
         return $this;
     }
 
@@ -172,6 +188,20 @@ class Operation {
         if(!Amount::validate($originalAmount))
             throw new AmountException($originalAmount);
         $this->originalAmount = $originalAmount;
+        return $this;
+    }
+    
+    public function setWithdrawalAmount($withdrawalAmount) {
+        if(!Amount::validate($withdrawalAmount))
+            throw new AmountException($withdrawalAmount);
+        $this->withdrawalAmount = $withdrawalAmount;
+        return $this;
+    }
+    
+    public function setCommissionAmount($commissionAmount) {
+        if(!Amount::validate($commissionAmount))
+            throw new AmountException($commissionAmount);
+        $this->commissionAmount = $commissionAmount;
         return $this;
     }
 

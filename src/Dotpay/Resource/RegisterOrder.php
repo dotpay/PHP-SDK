@@ -26,7 +26,7 @@ class RegisterOrder extends Resource {
         $config = $this->config;
         $operation = new Operation($resultArray['operation']['type'], $resultArray['operation']['number']);
         $operation->setUrl($resultArray['operation']['href'])
-                  ->setCreationTime(new DateTime($resultArray['operation']['creation_datetime']))
+                  ->setDateTime(new DateTime($resultArray['operation']['creation_datetime']))
                   ->setStatus($resultArray['operation']['status'])
                   ->setAmount($resultArray['operation']['amount'])
                   ->setCurrency($resultArray['operation']['currency'])

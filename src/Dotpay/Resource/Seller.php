@@ -116,7 +116,7 @@ class Seller extends Resource {
     private function getWrapedOperation($input) {
         $operation = new Operation($input['type'], $input['number']);
             $operation->setUrl($input['href'])
-                      ->setCreationTime(new \DateTime($input['creation_datetime']))
+                      ->setDateTime(new \DateTime($input['creation_datetime']))
                       ->setStatus($input['status'])
                       ->setAmount($input['amount'])
                       ->setCurrency($input['currency'])
