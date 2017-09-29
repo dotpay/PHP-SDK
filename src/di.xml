@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<objects>
+    <object class="Dotpay\Tool\Curl" alias="Curl" alwaysNew="true" />
+    <object class="Dotpay\Model\Configuration" alias="Config">
+        <param name="pluginId" value="" />
+    </object>
+    <object class="Dotpay\Model\Seller" alias="Seller">
+        <param name="id" />
+        <param name="pin" />
+        <param name="testMode" />
+    </object>
+    <object class="Dotpay\Model\Customer" alias="Customer">
+        <param name="email" />
+        <param name="firstName" />
+        <param name="lastName" />
+    </object>
+    <object class="Dotpay\Model\Payment" alias="PaymentModel">
+        <param name="seller" class="Seller" />
+        <param name="amount" />
+        <param name="currency" />
+        <param name="description" />
+        <param name="id" />
+    </object>
+    <object class="Dotpay\Model\Transaction" alias="Transaction">
+        <param name="customer" class="Customer" />
+        <param name="payment" class="PaymentModel" />
+    </object>
+    <object class="Dotpay\Model\CardBrand" alias="CardBrand">
+        <param name="name" />
+        <param name="logo" />
+        <param name="codename" />
+    </object>
+    <object class="Dotpay\Model\CreditCard" alias="CreditCard">
+        <param name="id" value="" />
+        <param name="userId" value="" />
+    </object>
+    <object class="Dotpay\Model\Operation" alias="Operation">
+        <param name="type" />
+        <param name="number" />
+    </object>
+    <object class="Dotpay\Model\BankAccount" alias="BankAccount">
+        <param name="name" />
+        <param name="number" />
+    </object>
+    <object class="Dotpay\Model\PaymentMethod" alias="PaymentMethod">
+        <param name="channelId" />
+        <param name="details" />
+        <param name="type" />
+    </object>
+    <object class="Dotpay\Model\Payer" alias="Payer">
+        <param name="email" />
+        <param name="firstname" value="" />
+        <param name="lastname" value="" />
+    </object>
+    <object class="Dotpay\Model\Notification" alias="Notification">
+        <param name="operation" class="Operation" />
+        <param name="channel" />
+    </object>
+    <object class="Dotpay\Model\Instruction" alias="Instruction" />
+    <object class="Dotpay\Model\Refund" alias="Refund">
+        <param name="payment" />
+        <param name="amount" />
+        <param name="control" />
+        <param name="description" />
+    </object>
+    <object class="Dotpay\Resource\Payment" alias="PaymentResource">
+        <param name="config" class="Config" />
+        <param name="curl" class="Curl" />
+    </object>
+    <object class="Dotpay\Resource\Seller" alias="SellerResource">
+        <param name="config" class="Config" />
+        <param name="curl" class="Curl" />
+    </object>
+    <object class="Dotpay\Resource\RegisterOrder" alias="RegisterOrder">
+        <param name="config" class="Config" />
+        <param name="curl" class="Curl" />
+    </object>
+    <object class="Dotpay\Resource\Github" alias="Github">
+        <param name="config" class="Config" />
+        <param name="curl" class="Curl" />
+    </object>
+    <object class="Dotpay\Channel\Blik" alias="Blik">
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Channel\Cc" alias="Cc">
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Channel\Channel" alias="Channel">
+        <param name="channelId" />
+        <param name="code" />
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Channel\Dotpay" alias="DotpayChannel">
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Channel\Mp" alias="Mp">
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Channel\Oc" alias="Oc">
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Channel\Paypal" alias="Paypal">
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Channel\Fcc" alias="Fcc">
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Processor\Confirmation" alias="Confirmation">
+        <param name="config" class="Config" />
+        <param name="resource" class="PaymentResource" />
+        <param name="seller" class="SellerResource" />
+    </object>
+    <object class="Dotpay\Locale\Adapter\Csv" alias="CsvAdapter">
+        <param name="dir" />
+        <param name="locale" />
+    </object>
+    <object class="Dotpay\Locale\Translator" alias="Translator">
+        <param name="adapter" class="CsvAdapter" />
+    </object>
+</objects>

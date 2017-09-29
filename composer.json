@@ -1,6 +1,7 @@
 {
-    "name": "tbajorek/dotapi",
-    "description": "Universal API to creating payment gateways for e-commerce thanks Dotpay services",
+    "name": "dotpay/php-sdk",
+    "version": "1.0",
+    "description": "Universal API to creating payment gateways for e-commerce thanks to Dotpay services",
     "keywords": [
         "dotpay",
         "payment",
@@ -10,23 +11,24 @@
     "homepage": "http://dotpay.pl",
     "license": "MIT",
     "authors": [{
-        "name": "Tomasz Bajorek",
-        "email": "tbajorek3@gmail.com",
+        "name": "Dotpay S.A.",
+        "email": "tech@dotpay.pl",
         "role": "Developer"
     }],
     "require": {
-        "php": "5.*"
+        "php": ">=5.4"
     },
     "require-dev": {
         "phpunit/phpunit": "5.5.*",
         "phpunit/php-invoker": "*",
         "phpunit/dbunit": ">=1.2",
-        "mockery/mockery": "dev-master"
+        "mockery/mockery": "dev-master",
+        "phpdocumentor/phpdocumentor":"2.*"
     },
     "autoload": {
-        "classmap": [
-            "src/"
-        ]
+        "psr-4": {
+            "Dotpay\\": "src/"
+        }
     },
     "autoload-dev": {
         "classmap": [
