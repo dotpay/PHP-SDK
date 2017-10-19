@@ -209,7 +209,7 @@ class Payment
         if (!Amount::validate($amount)) {
             throw new AmountException($amount);
         }
-        $this->amount = (float) rtrim($amount, '0');
+        $this->amount = floatval(str_replace(' ','',$amount));
 
         return $this;
     }
