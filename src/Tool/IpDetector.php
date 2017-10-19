@@ -22,25 +22,25 @@ abstract class IpDetector
     {
         if(self::$ipAddress === null) {
             if (getenv('HTTP_CLIENT_IP')) {
-                self::$ipaddress = getenv('HTTP_CLIENT_IP');
+                self::$ipAddress = getenv('HTTP_CLIENT_IP');
             } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
-                self::$ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+                self::$ipAddress = getenv('HTTP_X_FORWARDED_FOR');
             } elseif (getenv('HTTP_X_FORWARDED')) {
-                self::$ipaddress = getenv('HTTP_X_FORWARDED');
+                self::$ipAddress = getenv('HTTP_X_FORWARDED');
             } elseif (getenv('HTTP_FORWARDED_FOR')) {
-                self::$ipaddress = getenv('HTTP_FORWARDED_FOR');
+                self::$ipAddress = getenv('HTTP_FORWARDED_FOR');
             } elseif (getenv('HTTP_FORWARDED')) {
-                self::$ipaddress = getenv('HTTP_FORWARDED');
+                self::$ipAddress = getenv('HTTP_FORWARDED');
             } elseif (getenv('REMOTE_ADDR')) {
-                self::$ipaddress = getenv('REMOTE_ADDR');
+                self::$ipAddress = getenv('REMOTE_ADDR');
             } else {
-                self::$ipaddress = 'UNKNOWN';
+                self::$ipAddress = 'UNKNOWN';
             }
-            if (self::$ipaddress === '0:0:0:0:0:0:0:1' || self::$ipaddress === '::1') {
-                self::$ipaddress = $config::LOCAL_IP;
+            if (self::$ipAddress === '0:0:0:0:0:0:0:1' || self::$ipAddress === '::1') {
+                self::$ipAddress = $config::LOCAL_IP;
             }
         }
 
-        return self::$ipaddress;
+        return self::$ipAddress;
     }
 }

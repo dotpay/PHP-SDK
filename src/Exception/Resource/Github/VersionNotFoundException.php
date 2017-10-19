@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2017 Dotpay S.A. <techdotpay.pl>.
+ * Copyright (c) 2017 Dotpay S.A. <tech@dotpay.pl>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
