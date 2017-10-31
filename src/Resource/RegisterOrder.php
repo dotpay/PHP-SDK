@@ -177,7 +177,7 @@ class RegisterOrder extends Resource
      */
     private function getDataStructure(Channel $channel)
     {
-       $result = [
+       $resultRO = [
             'order' => [
                 'amount' => $channel->getTransaction()->getPayment()->getAmount(),
                 'currency' => $channel->getTransaction()->getPayment()->getCurrency(),
@@ -211,7 +211,7 @@ class RegisterOrder extends Resource
 				}
 		
 	if (!empty($channel->getTransaction()->getPayment()->getCustomer()->getStreet()) && !empty($channel->getTransaction()->getPayment()->getCustomer()->getPostCode()) && !empty($channel->getTransaction()->getPayment()->getCustomer()->getCity()) && !empty($channel->getTransaction()->getPayment()->getCustomer()->getCountry())){
-		$result['payer']['address'] = [
+		$resultRO['payer']['address'] = [
 			'street' => $channel->getTransaction()->getPayment()->getCustomer()->getStreet(),
 			'building_number' => $building_numberRO,
 			'postcode' => $channel->getTransaction()->getPayment()->getCustomer()->getPostCode(),
@@ -220,7 +220,7 @@ class RegisterOrder extends Resource
 		];
 	}
 	
-	return $result;
+	return $resultRO;
 	
 	}
     
