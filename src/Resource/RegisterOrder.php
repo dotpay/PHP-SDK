@@ -177,7 +177,7 @@ class RegisterOrder extends Resource
      */
     private function getDataStructure(Channel $channel)
     {
-        return [
+       $result = [
             'order' => [
                 'amount' => $channel->getTransaction()->getPayment()->getAmount(),
                 'currency' => $channel->getTransaction()->getPayment()->getCurrency(),
@@ -193,12 +193,6 @@ class RegisterOrder extends Resource
                 'first_name' => $channel->getTransaction()->getCustomer()->getFirstName(),
                 'last_name' => $channel->getTransaction()->getCustomer()->getLastName(),
                 'email' => $channel->getTransaction()->getCustomer()->getEmail(),
-                'address' => [
-                    'street' => $channel->getTransaction()->getCustomer()->getStreet(),
-                    'building_number' => $channel->getTransaction()->getCustomer()->getBuildingNumber(),
-                    'postcode' => $channel->getTransaction()->getCustomer()->getPostCode(),
-                    'city' => $channel->getTransaction()->getCustomer()->getCity(),
-                    'country' => $channel->getTransaction()->getCustomer()->getCountry(),
                 ],
             ],
             'payment_method' => [
@@ -208,5 +202,26 @@ class RegisterOrder extends Resource
                 'ip' => IpDetector::detect($this->config),
             ],
         ];
-    }
+    
+	if (!empty($channel->getTransaction()->getPayment()->getCustomer()->getBuildingNumber()))
+				{
+					$building_numberRO = $channel->getTransaction()->getPayment()->getCustomer()->getBuildingNumber();
+				}else{
+					$building_numberRO = " "; //this field may not be blank in register order.
+				}
+		
+	if (!empty($channel->getTransaction()->getPayment()->getCustomer()->getStreet()) && !empty($channel->getTransaction()->getPayment()->getCustomer()->getPostCode()) && !empty($channel->getTransaction()->getPayment()->getCustomer()->getCity()) && !empty($channel->getTransaction()->getPayment()->getCustomer()->getCountry())){
+		$result['payer']['address'] = [
+			'street' => $channel->getTransaction()->getPayment()->getCustomer()->getStreet(),
+			'building_number' => $building_numberRO,
+			'postcode' => $channel->getTransaction()->getPayment()->getCustomer()->getPostCode(),
+			'city' => $channel->getTransaction()->getPayment()->getCustomer()->getCity(),
+			'country' => $channel->getTransaction()->getPayment()->getCustomer()->getCountry(),
+		];
+	}
+	
+	return $result;
+	
+	}
+    
 }
