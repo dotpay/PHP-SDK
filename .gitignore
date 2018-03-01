@@ -6,3 +6,4 @@ vpproject
 composer.lock
 doc/
 output/
+.idea/

@@ -29,6 +29,8 @@ namespace Dotpay\Resource;
 
 use Dotpay\Resource\Github\Version;
 use Dotpay\Exception\Resource\Github\VersionNotFoundException;
+use Dotpay\Exception\Resource\Github\ResourceMalformedException;
+use Dotpay\Exception\Resource\Github\AssetNotFoundException;
 use Dotpay\Exception\BadReturn\TypeNotCompatibleException;
 use Dotpay\Exception\Resource\NotFoundException;
 use DateTime;
@@ -76,12 +78,18 @@ class Github extends Resource
      * @return Version
      *
      * @throws VersionNotFoundException   Thrown when any latest version of the project is not found
+     * @throws ResourceMalformedException Thrown when the received data from Github is malformed
      * @throws TypeNotCompatibleException Thrown when a response from Github server is in incompatible type
      */
     public function getLatestProjectVersion($username, $project)
     {
         try {
             $content = $this->getContent(self::githubUrl.'repos/'.$username.'/'.$project.'/releases/latest');
+            if(!is_array($content)) {
+                throw new ResourceMalformedException();
+            } else if(!isset($content['assets'][0])) {
+                throw new AssetNotFoundException($username.'/'.$project.' ('.$content['tag_name'].')');
+            }
         } catch (NotFoundException $ex) {
             throw new VersionNotFoundException($username.'/'.$project);
         }

@@ -54,6 +54,7 @@ Seller with given id (%1) is not recognized=Sprzedawca o podanym identyfikatorze
 Account of seller is not recognized by Dotpay server=Konto sprzedawcy nie jest rozpoznane przez serwer Dotpay
 Channel is not recognized by Dotpay server=Kanał nie jest rozpoznany przez serwer Dotpay
 Version data is not found for given project=Dane wersji nie zostały znalezione dla podanego projektu
+The receied Github data is malformed=Otrzymane dane z Githuba są źle sformatowane
 Operation with given identificator is not found on Dotpay server=Operacja o podanym identyfikatorze nie została znaleziona na serwerze Dotpay
 An error with Dotpay API has been occured. Details: %1=Wystąpił błąd z API Dotpay. Szczegóły: %1
 Dotpay API is forbidden to using=Używanie API Dotpay jest zabronione
