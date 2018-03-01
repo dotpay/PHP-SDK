@@ -177,36 +177,63 @@ class RegisterOrder extends Resource
      */
     private function getDataStructure(Channel $channel)
     {
-        return [
+        $resultRO = [
             'order' => [
                 'amount' => $channel->getTransaction()->getPayment()->getAmount(),
                 'currency' => $channel->getTransaction()->getPayment()->getCurrency(),
                 'description' => $channel->getTransaction()->getPayment()->getDescription(),
-                'control' => $channel->getTransaction()->getPayment()->getId(),
+                'control' => $channel->getTransaction()->getPayment()->getId()
             ],
             'seller' => [
                 'account_id' => $channel->getTransaction()->getPayment()->getSeller()->getId(),
                 'url' => $channel->getTransaction()->getBackUrl(),
-                'urlc' => $channel->getTransaction()->getConfirmUrl(),
+                'urlc' => $channel->getTransaction()->getConfirmUrl()
             ],
             'payer' => [
                 'first_name' => $channel->getTransaction()->getCustomer()->getFirstName(),
                 'last_name' => $channel->getTransaction()->getCustomer()->getLastName(),
-                'email' => $channel->getTransaction()->getCustomer()->getEmail(),
-                'address' => [
-                    'street' => $channel->getTransaction()->getCustomer()->getStreet(),
-                    'building_number' => $channel->getTransaction()->getCustomer()->getBuildingNumber(),
-                    'postcode' => $channel->getTransaction()->getCustomer()->getPostCode(),
-                    'city' => $channel->getTransaction()->getCustomer()->getCity(),
-                    'country' => $channel->getTransaction()->getCustomer()->getCountry(),
-                ],
+                'email' => $channel->getTransaction()->getCustomer()->getEmail()
             ],
             'payment_method' => [
-                'channel_id' => $channel->getChannelId(),
+                'channel_id' => $channel->getChannelId()
             ],
             'request_context' => [
-                'ip' => IpDetector::detect($this->config),
-            ],
+                'ip' => IpDetector::detect($this->config)
+            ]
         ];
+    
+        if (!empty($channel->getTransaction()->getPayment()->getCustomer()->getBuildingNumber())) {
+            $building_numberRO = $channel->getTransaction()->getPayment()->getCustomer()->getBuildingNumber();
+        } else {
+            $building_numberRO = ' '; //this field may not be blank in register order.
+        }
+
+        if ($this->isFilledAddress($channel)){
+            $resultRO['payer']['address'] = [
+                'street' => $channel->getTransaction()->getPayment()->getCustomer()->getStreet(),
+                'building_number' => $building_numberRO,
+                'postcode' => $channel->getTransaction()->getPayment()->getCustomer()->getPostCode(),
+                'city' => $channel->getTransaction()->getPayment()->getCustomer()->getCity(),
+                'country' => $channel->getTransaction()->getPayment()->getCustomer()->getCountry(),
+            ];
+        }
+
+        return $resultRO;
+	}
+
+    /**
+     * Check if address in transaction is correctly filled
+     *
+     * @param Channel $channel Data of channel which should be used to realizing the operation
+     *
+     * @return bool
+     */
+    private function isFilledAddress(Channel $channel)
+    {
+        $customer = $channel->getTransaction()->getPayment()->getCustomer();
+        return !empty($customer->getStreet())
+            && !empty($customer->getPostCode())
+            && !empty($customer->getCity())
+            && !empty($customer->getCountry());
     }
 }

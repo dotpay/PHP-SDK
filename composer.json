@@ -1,5 +1,5 @@
 {
-    "name": "dotpay/php-sdk",
+    "name": "dotpay/PHP-SDK",
     "version": "1.0.3",
     "description": "Universal API to creating payment gateways for e-commerce thanks to Dotpay services",
     "keywords": [
