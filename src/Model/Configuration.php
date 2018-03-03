@@ -841,8 +841,8 @@ class Configuration
      * @throws IdException Thrown when the given seller id is incorrect
      */
     public function setId($id)
-    {
-        if (!Id::validate($id)) {
+    {//var_dump($this->getEnable());die();
+        if (!Id::validate($id) && ($this->getEnable() || !empty($id))) {
             throw new IdException($id);
         }
         $this->id = (int) $id;
@@ -861,7 +861,7 @@ class Configuration
      */
     public function setPin($pin)
     {
-        if (!Pin::validate($pin)) {
+        if (!Pin::validate($pin) && ($this->getEnable() || !empty($pin))) {
             throw new PinException($pin);
         }
         $this->pin = (string) $pin;
@@ -1242,6 +1242,16 @@ class Configuration
         $this->api = $api;
 
         return $this;
+    }
+
+    /**
+     * Check if payment module is activated
+     *
+     * @return boolean
+     */
+    public function isActivated()
+    {
+        return $this->getEnable() && Id::validate($this->getId()) && Pin::validate($this->getPin());
     }
 
     /**

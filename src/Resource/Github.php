@@ -83,12 +83,16 @@ class Github extends Resource
      */
     public function getLatestProjectVersion($username, $project)
     {
+        $asset = NULL;
         try {
             $content = $this->getContent(self::githubUrl.'repos/'.$username.'/'.$project.'/releases/latest');
             if(!is_array($content)) {
                 throw new ResourceMalformedException();
             } else if(!isset($content['assets'][0])) {
-                throw new AssetNotFoundException($username.'/'.$project.' ('.$content['tag_name'].')');
+                //throw new AssetNotFoundException($username.'/'.$project.' ('.$content['tag_name'].')');
+                $asset = $content['html_url'];
+            } else {
+                $asset = $content['assets'][0]['browser_download_url'];
             }
         } catch (NotFoundException $ex) {
             throw new VersionNotFoundException($username.'/'.$project);
@@ -96,8 +100,9 @@ class Github extends Resource
         if (!is_array($content)) {
             throw new TypeNotCompatibleException(gettype($content));
         }
-        $version = new Version($content['tag_name'], $content['assets'][0]['browser_download_url']);
-        $version->setUrl($content['url'])
+        $version = new Version($content['tag_name'], $asset);
+        $version->setApiUrl($content['url'])
+                ->setUrl($content['html_url'])
                 ->setCreated(new DateTime($content['created_at']))
                 ->setPublished(new DateTime($content['published_at']));
 

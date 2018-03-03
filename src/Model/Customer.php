@@ -116,13 +116,16 @@ class Customer extends Payer
             $provider->getFirstName(),
             $provider->getLastName()
         );
-        $customer->setStreet($provider->getStreet())
-                 ->setBuildingNumber($provider->getBuildingNumber())
-                 ->setPostCode($provider->getPostCode())
-                 ->setCity($provider->getCity())
-                 ->setCountry($provider->getCountry())
-                 ->setPhone($provider->getPhone())
-                 ->setLanguage($provider->getLanguage());
+
+        if($provider->isAddressAvailable()) {
+            $customer->setStreet($provider->getStreet())
+                     ->setBuildingNumber($provider->getBuildingNumber())
+                     ->setPostCode($provider->getPostCode())
+                     ->setCity($provider->getCity())
+                     ->setCountry($provider->getCountry())
+                     ->setPhone($provider->getPhone())
+                     ->setLanguage($provider->getLanguage());
+        }
 
         return $customer;
     }
@@ -356,6 +359,20 @@ class Customer extends Payer
         $this->language = (string) $language;
 
         return $this;
+    }
+
+    /**
+     * Check if address details are available
+     *
+     * @return boolean
+     */
+    public function isAddressAvailable()
+    {
+        return $this->street !== ''
+            && $this->postCode !== ''
+            && $this->city !== ''
+            && $this->country !== ''
+            && $this->phone !== '';
     }
 
     /**

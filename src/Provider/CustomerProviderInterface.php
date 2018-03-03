@@ -108,4 +108,11 @@ interface CustomerProviderInterface
      * @return string
      */
     public function getLanguage();
+
+    /**
+     * Check if address details are available
+     *
+     * @return boolean
+     */
+    public function isAddressAvailable();
 }

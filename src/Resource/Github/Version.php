@@ -42,7 +42,12 @@ class Version
     private $number;
 
     /**
-     * @var string Url where are available informations about the version
+     * @var string Url to Github API where is done request for the version
+     */
+    private $apiUrl;
+
+    /**
+     * @var string Url to Github where is published the version
      */
     private $url;
 
@@ -67,10 +72,12 @@ class Version
      * @param string $number Number of the version
      * @param string $zip    Url address of a place where from it's possible do download a zip file with a software
      */
-    public function __construct($number, $zip)
+    public function __construct($number, $zip = null)
     {
         $this->setNumber($number);
-        $this->setZip($zip);
+        if($zip !== null) {
+            $this->setZip($zip);
+        }
     }
 
     /**
@@ -84,7 +91,17 @@ class Version
     }
 
     /**
-     * Return an url where are available informations about the version.
+     * Return an url to Github API where is done request for the version.
+     *
+     * @return string
+     */
+    public function getApiUrl()
+    {
+        return $this->apiUrl;
+    }
+
+    /**
+     * Return an url to Github where is published the version.
      *
      * @return string
      */
@@ -100,6 +117,9 @@ class Version
      */
     public function getZip()
     {
+        if($this->zip === null) {
+            return $this->getUrl();
+        }
         return $this->zip;
     }
 
@@ -150,9 +170,28 @@ class Version
     }
 
     /**
-     * Set an url where are available informations about the version.
+     * Set an url to Github API where is done request for the version.
      *
-     * @param string $url Url where are available informations about the version
+     * @param string $apiUrl Url to Github API where is done request for the version
+     *
+     * @return Version
+     *
+     * @throws UrlException
+     */
+    public function setApiUrl($apiUrl)
+    {
+        if (!Url::validate($apiUrl)) {
+            throw new UrlException($apiUrl);
+        }
+        $this->apiUrl = $apiUrl;
+
+        return $this;
+    }
+
+    /**
+     * Set an url to Github where is published the version.
+     *
+     * @param string $url Url to Github where is published the version
      *
      * @return Version
      *

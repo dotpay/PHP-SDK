@@ -349,12 +349,14 @@ class Channel
         $data['firstname'] = $this->transaction->getCustomer()->getFirstName();
         $data['lastname'] = $this->transaction->getCustomer()->getLastName();
         $data['email'] = $this->transaction->getCustomer()->getEmail();
-        $data['phone'] = $this->transaction->getCustomer()->getPhone();
-        $data['street'] = $this->transaction->getCustomer()->getStreet();
-        $data['street_n1'] = $this->transaction->getCustomer()->getBuildingNumber();
-        $data['city'] = $this->transaction->getCustomer()->getCity();
-        $data['postcode'] = $this->transaction->getCustomer()->getPostCode();
-        $data['country'] = $this->transaction->getCustomer()->getCountry();
+        if($this->transaction->getCustomer()->isAddressAvailable()) {
+            $data['phone'] = $this->transaction->getCustomer()->getPhone();
+            $data['street'] = $this->transaction->getCustomer()->getStreet();
+            $data['street_n1'] = $this->transaction->getCustomer()->getBuildingNumber();
+            $data['city'] = $this->transaction->getCustomer()->getCity();
+            $data['postcode'] = $this->transaction->getCustomer()->getPostCode();
+            $data['country'] = $this->transaction->getCustomer()->getCountry();
+        }
         $data['bylaw'] = 1;
         $data['personal_data'] = 1;
         $data['channel'] = $this->getChannelId();
