@@ -58,8 +58,10 @@ class Customer extends Payer
         'fr',
         'es',
         'cz',
+		'cs',
         'ru',
-        'bg',
+        'hu',
+		'ro',
     );
 
     /**
