@@ -41,6 +41,6 @@ class OpNumber implements IValidate
      */
     public static function validate($value)
     {
-        return (bool) preg_match('/^M\d{4}\-\d{4}$/', $value);
+        return (bool) preg_match('/^M\d{4}\-\d{4,5}$/', $value);
     }
 }
