@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2017 Dotpay S.A. <tech@dotpay.pl>.
+ * Copyright (c) 2018 Dotpay sp. z o.o. <tech@dotpay.pl>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  * SOFTWARE.
  *
  * @author    Dotpay Team <tech@dotpay.pl>
- * @copyright Dotpay S.A
+ * @copyright Dotpay sp. z o.o.
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 
@@ -41,6 +41,6 @@ class OpNumber implements IValidate
      */
     public static function validate($value)
     {
-        return (bool) preg_match('/^M\d{4}\-\d{4,5}$/', $value);
+        return (bool) preg_match('/^M\d{4,5}\-\d{4,5}$/', $value);
     }
 }
