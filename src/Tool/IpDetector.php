@@ -9,7 +9,7 @@ abstract class IpDetector
     /**
      * @var string/null IP address of client
      */
-    static private $ipAddress = null;
+    static private $ipaddress = null;
     
     /**
      * Return ip address from is the confirmation request.
