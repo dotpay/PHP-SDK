@@ -170,6 +170,7 @@ class Confirmation
             $this->completeInformations();
             throw new ConfirmationInfoException($this->outputMessage);
         }
+
         $this->checkIp();
         $this->checkMethod();
         $this->checkCurrency();
@@ -356,7 +357,7 @@ class Confirmation
             $creditCard = null;
             if ($this->notification->getCreditCard() !== null) {
                 $creditCard = $this->notification->getCreditCard();
-            } else {
+            } elseif($this->sellerApi->isAccountRight()) {
                 $operationFromApi = $this->sellerApi->getOperationByNumber($operation->getNumber());
                 $paymentMethod = $operationFromApi->getPaymentMethod();
                 if ($paymentMethod !== null && $paymentMethod->getDetailsType() == $paymentMethod::CREDIT_CARD) {

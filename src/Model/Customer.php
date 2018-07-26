@@ -149,8 +149,6 @@ class Customer extends Payer
      */
     public function getStreet()
     {
-        $this->extractBnFromStreet();
-
         return $this->street;
     }
 
@@ -161,8 +159,6 @@ class Customer extends Payer
      */
     public function getBuildingNumber()
     {
-        $this->extractBnFromStreet();
-
         return $this->buildingNumber;
     }
 
@@ -241,6 +237,7 @@ class Customer extends Payer
      */
     public function setStreet($street)
     {
+        $street = $this->extractStreet($street);
         if (!Street::validate($street)) {
             throw new StreetException($street);
         }
@@ -260,6 +257,7 @@ class Customer extends Payer
      */
     public function setBuildingNumber($buildingNumber)
     {
+        $buildingNumber = $this->extractBnFromStreet($buildingNumber);
         if (!BNumber::validate($buildingNumber)) {
             throw new BNumberException($buildingNumber);
         }
@@ -380,14 +378,50 @@ class Customer extends Payer
     /**
      * Try to extract a building number from the street name if it's an empty field.
      */
-    private function extractBnFromStreet()
+    private function extractBnFromStreet($buildingNumber)
     {
-        if (empty($this->buildingNumber) && !empty($this->street)) {
-            preg_match("/\s[\w\d\/_\-]{0,30}$/", $this->street, $matches);
+        $street = $this->street;
+        if (empty($buildingNumber) && !empty($street)) {
+                       
+            preg_match("/\s[\p{L}0-9\s\-_\/]{1,15}$/u", $street, $matches);
+           
             if (count($matches) > 0) {
-                $this->setBuildingNumber(trim($matches[0]));
-                $this->setStreet(str_replace($matches[0], '', $this->street));
+
+                $buildingNumber = preg_replace('/[^\p{L}0-9\s\-_\/]/u','',trim($matches[0]));
+
+                $street2 = str_replace($matches[0], '', $street);
+                $street = preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street2);
+           
+            } else {
+                $street = trim(preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street));
             }
+        } else {
+            $street = trim(preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street));
         }
+        return $buildingNumber;
+    }
+
+    private function extractStreet($street)
+    {
+        $buildingNumber = $this->buildingNumber;
+        if (empty($buildingNumber) && !empty($street)) {
+
+            preg_match("/\s[\p{L}0-9\s\-_\/]{1,15}$/u", $street, $matches);
+
+            if (count($matches) > 0) {
+
+                $buildingNumber = preg_replace('/[^\p{L}0-9\s\-_\/]/u','',trim($matches[0]));
+
+                $street2 = str_replace($matches[0], '', $street);
+                $street = preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street2);
+
+            } else {
+                $street = trim(preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street));
+            }
+        } else {
+            $street = trim(preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street));
+        }
+        $this->buildingNumber = $buildingNumber;
+        return $street;
     }
 }

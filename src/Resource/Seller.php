@@ -324,6 +324,8 @@ class Seller extends Resource
             $account = $this->getAccount($id);
         } catch (UnauthorizedException $e) {
             return false;
+        } catch (AccountNotFoundException $e) {
+            return false;
         }
         if ($account->getId() === (int) $id && $account->getPin() === $pin) {
             return true;
