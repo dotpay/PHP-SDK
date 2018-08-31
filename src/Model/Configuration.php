@@ -783,9 +783,11 @@ class Configuration
         }
         if ($this->isFccEnable()) {
             $channels[] = self::FCC_CHANNEL;
+            $channels[] = self::CC_CHANNEL;
         }
         if ($this->getCcVisible()) {
             $channels[] = self::CC_CHANNEL;
+            $channels[] = self::FCC_CHANNEL;
         }
         if ($this->getBlikVisible()) {
             $channels[] = self::BLIK_CHANNEL;

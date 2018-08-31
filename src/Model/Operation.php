@@ -90,7 +90,7 @@ class Operation
     /**
      * @var bool A flag if operation is marked as completed in Seller panel
      */
-    private $completed = false;
+    private $completed = null;
 
     /**
      * @var float|null An original amount which was sent from a shop
@@ -222,7 +222,7 @@ class Operation
             $operation->setCommissionAmount($provider->getCommissionAmount());
         }
         if ($provider->getCompleted() !== null) {
-            $operation->setCompleted($provider->getCompleted());
+            $operation->setCompleted($provider->getCompleted() === "true");
         }
         if ($provider->getRelatedNumber() !== null) {
             $operation->setRelatedNumber($provider->getRelatedNumber());
@@ -337,11 +337,32 @@ class Operation
     /**
      * Return a flag if operation is marked as completed in Seller panel.
      *
-     * @return bool
+     * @return bool|null
      */
     public function isCompleted()
     {
         return $this->completed;
+    }
+
+    /**
+     * Return a string representation of $this->isCompleted() for calculating signature.
+     *
+     * @return string
+     */
+    public function isCompletedString()
+    {
+        if($this->isCompleted() === null)
+        {
+            return "";
+        }
+        elseif($this->isCompleted() === true)
+        {
+            return "true";
+        }
+        else
+        {
+            return "false";
+        }
     }
 
     /**
