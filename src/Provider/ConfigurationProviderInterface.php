@@ -152,6 +152,20 @@ interface ConfigurationProviderInterface
     public function getWidgetVisible();
 
     /**
+     * Return an array which contains a list with channel numbers pulled out of the main channel.
+     *
+     * @return array
+     */
+    public function getOtherChannels();
+
+    /**
+     * Check if other channels are set as visible.
+     *
+     * @return bool
+     */
+    public function getOtherChannelsVisible();
+
+    /**
      * Return a string which contains a list with currency codes for which main Dotpay channel is disabled.
      *
      * @return string

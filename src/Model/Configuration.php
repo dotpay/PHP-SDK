@@ -135,6 +135,16 @@ class Configuration
     ];
 
     /**
+     * @var bool Flag which inform if other channels are enabled in a shop
+     */
+    private $otherChannelsVisible = false;
+
+    /**
+     * List of payment methods pulled out of the main channel
+     */
+    private $otherChannels = [];
+
+    /**
      * @var string Id of plugin where is used SDK
      */
     private $pluginId = '';
@@ -287,32 +297,32 @@ class Configuration
     {
         $configuration = new static($provider->getPluginId());
         $configuration->setEnable($provider->getEnable())
-                      ->setId($provider->getId())
-                      ->setPin($provider->getPin())
-                      ->setUsername($provider->getUsername())
-                      ->setPassword($provider->getPassword())
-                      ->setTestMode($provider->getTestMode())
-                      ->setOcVisible($provider->getOcVisible())
-                      ->setFccVisible($provider->getFccVisible())
-                      ->setFccId($provider->getFccId())
-                      ->setFccPin($provider->getFccPin())
-                      ->setFccCurrencies($provider->getFccCurrencies())
-                      ->setCcVisible($provider->getCcVisible())
-                      ->setMpVisible($provider->getMpVisible())
-                      ->setBlikVisible($provider->getBlikVisible())
-                      ->setPaypalVisible($provider->getPaypalVisible())
-                      ->setWidgetVisible($provider->getWidgetVisible())
-                      ->setWidgetCurrencies($provider->getWidgetCurrencies())
-                      ->setInstructionVisible($provider->getInstructionVisible())
-                      ->setRefundsEnable($provider->getRefundsEnable())
-                      ->setRenew($provider->getRenew())
-                      ->setRenewDays($provider->getRenewDays())
-                      ->setSurcharge($provider->getSurcharge())
-                      ->setSurchargeAmount($provider->getSurchargeAmount())
-                      ->setSurchargePercent($provider->getSurchargePercent())
-                      ->setShopName($provider->getShopName())
-                      ->setMultimerchant($provider->getMultimerchant())
-                      ->setApi($provider->getApi());
+            ->setId($provider->getId())
+            ->setPin($provider->getPin())
+            ->setUsername($provider->getUsername())
+            ->setPassword($provider->getPassword())
+            ->setTestMode($provider->getTestMode())
+            ->setOcVisible($provider->getOcVisible())
+            ->setFccVisible($provider->getFccVisible())
+            ->setFccId($provider->getFccId())
+            ->setFccPin($provider->getFccPin())
+            ->setFccCurrencies($provider->getFccCurrencies())
+            ->setCcVisible($provider->getCcVisible())
+            ->setMpVisible($provider->getMpVisible())
+            ->setBlikVisible($provider->getBlikVisible())
+            ->setOtherChannels($provider->getOtherChannels())
+            ->setOtherChannelsVisible($provider->getOtherChannelsVisible())
+            ->setWidgetVisible($provider->getWidgetVisible())
+            ->setWidgetCurrencies($provider->getWidgetCurrencies())
+            ->setInstructionVisible($provider->getInstructionVisible())
+            ->setRefundsEnable($provider->getRefundsEnable())
+            ->setRenew($provider->getRenew())
+            ->setRenewDays($provider->getRenewDays())
+            ->setSurchargeAmount($provider->getSurchargeAmount())
+            ->setSurchargePercent($provider->getSurchargePercent())
+            ->setShopName($provider->getShopName())
+            ->setMultimerchant($provider->getMultimerchant())
+            ->setApi($provider->getApi());
 
         return $configuration;
     }
@@ -435,8 +445,8 @@ class Configuration
     public function isOcEnable()
     {
         return $this->getOcVisible() &&
-               !(empty($this->username) &&
-                 empty($this->password));
+            !(empty($this->username) &&
+                empty($this->password));
     }
 
     /**
@@ -487,9 +497,9 @@ class Configuration
     public function isFccEnable()
     {
         return $this->getFccVisible() &&
-               !(empty($this->fccId) &&
-                 empty($this->fccPin) &&
-                 empty($this->fccCurrencies));
+            !(empty($this->fccId) &&
+                empty($this->fccPin) &&
+                empty($this->fccCurrencies));
     }
 
     /**
@@ -540,6 +550,26 @@ class Configuration
     public function getWidgetVisible()
     {
         return $this->widgetVisible;
+    }
+
+    /**
+     * Check if other channels are visible.
+     *
+     * @return bool
+     */
+    public function getOtherChannelsVisible()
+    {
+        return $this->otherChannelsVisible;
+    }
+
+    /**
+     * Check which other channels are visible.
+     *
+     * @return bool
+     */
+    public function getOtherChannels()
+    {
+        return $this->otherChannels;
     }
 
     /**
@@ -798,7 +828,17 @@ class Configuration
         if ($this->getPaypalVisible()) {
             $channels[] = self::PAYPAL_CHANNEL;
         }
+        if (count($this->otherChannels) > 0)
+        {
+            foreach($this->otherChannels as $ch)
+            {
+                if(is_numeric($ch) && $ch > 0) {
+                    $channels[] = (int) $ch;
+                }
+            }
+        }
         if (count($channels)) {
+
             return $channels;
         } else {
             return null;
@@ -947,6 +987,34 @@ class Configuration
     public function setFccVisible($fccVisible)
     {
         $this->fccVisible = (bool) $fccVisible;
+
+        return $this;
+    }
+
+    /**
+     * Set the flag which informs if other channels are visible.
+     *
+     * @param bool $otherChannelsVisible other channles visible flag
+     *
+     * @return Configuration
+     */
+    public function setOtherChannelsVisible($otherChannelsVisible)
+    {
+        $this->otherChannelsVisible = (bool) $otherChannelsVisible;
+
+        return $this;
+    }
+
+    /**
+     * Set the list of channels out of widget.
+     *
+     * @param array $otherChannels ids of channels put out of widget
+     *
+     * @return Configuration
+     */
+    public function setOtherChannels($otherChannels)
+    {
+        $this->otherChannels = $otherChannels;
 
         return $this;
     }

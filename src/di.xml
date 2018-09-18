@@ -123,6 +123,12 @@
         <param name="paymentResource" class="PaymentResource" />
         <param name="sellerResource" class="SellerResource" />
     </object>
+    <object class="Dotpay\Channel\Other" alias="Other">
+        <param name="config" class="Config" />
+        <param name="transaction" class="Transaction" />
+        <param name="paymentResource" class="PaymentResource" />
+        <param name="sellerResource" class="SellerResource" />
+    </object>
     <object class="Dotpay\Channel\Fcc" alias="Fcc">
         <param name="config" class="Config" />
         <param name="transaction" class="Transaction" />
