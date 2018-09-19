@@ -48,7 +48,7 @@ class Instruction
     /**
      * Name of the recipient of payment.
      */
-    const RECIPIENT_NAME = 'DOTPAY SA';
+    const RECIPIENT_NAME = 'Dotpay sp. z o.o.';
 
     /**
      * Street of the recipient of payment.

@@ -202,19 +202,19 @@ class RegisterOrder extends Resource
             ]
         ];
     
-        if (!empty($channel->getTransaction()->getPayment()->getCustomer()->getBuildingNumber())) {
-            $building_numberRO = $channel->getTransaction()->getPayment()->getCustomer()->getBuildingNumber();
+        if (!empty($channel->getTransaction()->getCustomer()->getBuildingNumber())) {
+            $building_numberRO = $channel->getTransaction()->getCustomer()->getBuildingNumber();
         } else {
             $building_numberRO = ' '; //this field may not be blank in register order.
         }
 
         if ($this->isFilledAddress($channel)){
             $resultRO['payer']['address'] = [
-                'street' => $channel->getTransaction()->getPayment()->getCustomer()->getStreet(),
+                'street' => $channel->getTransaction()->getCustomer()->getStreet(),
                 'building_number' => $building_numberRO,
-                'postcode' => $channel->getTransaction()->getPayment()->getCustomer()->getPostCode(),
-                'city' => $channel->getTransaction()->getPayment()->getCustomer()->getCity(),
-                'country' => $channel->getTransaction()->getPayment()->getCustomer()->getCountry(),
+                'postcode' => $channel->getTransaction()->getCustomer()->getPostCode(),
+                'city' => $channel->getTransaction()->getCustomer()->getCity(),
+                'country' => $channel->getTransaction()->getCustomer()->getCountry(),
             ];
         }
 
@@ -230,7 +230,7 @@ class RegisterOrder extends Resource
      */
     private function isFilledAddress(Channel $channel)
     {
-        $customer = $channel->getTransaction()->getPayment()->getCustomer();
+        $customer = $channel->getTransaction()->getCustomer();
         return !empty($customer->getStreet())
             && !empty($customer->getPostCode())
             && !empty($customer->getCity())
