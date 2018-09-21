@@ -332,7 +332,10 @@ class Channel
         $data = [];
         $data['id'] = $this->seller->getId();
         $data['control'] = $this->transaction->getPayment()->getId();
-        $data['p_info'] = $this->transaction->getPayment()->getSeller()->getInfo();
+        $sellerInfo = $this->transaction->getPayment()->getSeller()->getInfo();
+        if (!empty($sellerInfo)) {
+            $data['p_info'] = $sellerInfo;
+        }
         $sellerEmail = $this->transaction->getPayment()->getSeller()->getEmail();
         if (!empty($sellerEmail)) {
             $data['p_email'] = $sellerEmail;
