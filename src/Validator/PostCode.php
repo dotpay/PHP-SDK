@@ -39,8 +39,10 @@ class PostCode implements IValidate
      *
      * @return bool
      */
-    public static function validate($value)
-    {
-        return (bool) preg_match('/^[A-Za-z0-9\-]{2,}$/', $value);
-    }
+
+ public static function validate($value) {
+    $value1 = trim($value);
+    return (bool)preg_match('/^[\d\w\s\-]{0,20}$/', $value1) || empty($value1);
+}
+
 }
