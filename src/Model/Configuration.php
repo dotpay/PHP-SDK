@@ -131,7 +131,9 @@ class Configuration
         'JPY',
         'CZK',
         'SEK',
-        'PLN',
+        'UAH',
+        'RON',
+        'PLN'
     ];
 
     /**
