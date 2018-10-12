@@ -284,15 +284,17 @@ class Request
      *
      * @throws AmountException Thrown when the given amount is incorrect
      */
-    public function setAmount($amount)
-    {
-        if (!Amount::validate($amount)) {
-            throw new AmountException($amount);
-        }
-        $this->amount = floatval(str_replace(' ','',$amount));
+     public function setAmount($amount)
+     {
+         $amount = floatval(str_replace(' ','',$amount));
 
-        return $this;
-    }
+         if (!Amount::validate($amount)) {
+             throw new AmountException($amount);
+         }
+         $this->amount = $amount;
+
+         return $this;
+     }
 
     /**
      * Set a currency code of the request.

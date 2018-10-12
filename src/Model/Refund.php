@@ -143,10 +143,12 @@ class Refund
      */
     public function setAmount($amount)
     {
+        $amount = floatval(str_replace(' ','',$amount));
+
         if (!Amount::validate($amount)) {
             throw new AmountException($amount);
         }
-        $this->amount = floatval(str_replace(' ','',$amount));
+        $this->amount = $amount;
 
         return $this;
     }

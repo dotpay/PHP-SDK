@@ -58,10 +58,10 @@ class Customer extends Payer
         'fr',
         'es',
         'cz',
-	'cs',
+	    'cs',
         'ru',
         'hu',
-	'ro',
+	    'ro',
     );
 
     /**
@@ -316,7 +316,8 @@ class Customer extends Payer
     public function setCountry($country)
     {
         if (!Name::validate($country)) {
-            throw new CountryException($country);
+            //throw new CountryException($country);
+            $country = '';
         }
         $this->country = (string) $country;
 
@@ -354,7 +355,8 @@ class Customer extends Payer
     public function setLanguage($language)
     {
         if (!Language::validate($language)) {
-            throw new LanguageException($language);
+            //throw new LanguageException($language);
+            $language = 'en';
         }
         $this->language = (string) $language;
 
@@ -382,16 +384,16 @@ class Customer extends Payer
     {
         $street = $this->street;
         if (empty($buildingNumber) && !empty($street)) {
-                       
+
             preg_match("/\s[\p{L}0-9\s\-_\/]{1,15}$/u", $street, $matches);
-           
+
             if (count($matches) > 0) {
 
                 $buildingNumber = preg_replace('/[^\p{L}0-9\s\-_\/]/u','',trim($matches[0]));
 
                 $street2 = str_replace($matches[0], '', $street);
                 $street = preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street2);
-           
+
             } else {
                 $street = trim(preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street));
             }

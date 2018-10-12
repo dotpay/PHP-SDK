@@ -561,6 +561,8 @@ class Operation
      */
     public function setAmount($amount)
     {
+        $amount = floatval(str_replace(' ','',$amount));
+
         if (!Amount::validate($amount)) {
             throw new AmountException($amount);
         }
@@ -652,6 +654,7 @@ class Operation
      */
     public function setOriginalAmount($originalAmount)
     {
+        $originalAmount = floatval(str_replace(' ','',$originalAmount));
         if (!Amount::validate($originalAmount)) {
             throw new AmountException($originalAmount);
         }
