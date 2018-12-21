@@ -218,12 +218,12 @@ class Notification
             $this->getOperation()->getNumber().
             $this->getOperation()->getType().
             $this->getOperation()->getStatus().
-            $this->getOperation()->getAmount().
+            number_format($this->getOperation()->getAmount(),2, '.', '').
             $this->getOperation()->getCurrency().
-            $this->getOperation()->getWithdrawalAmount().
-            $this->getOperation()->getCommissionAmount().
+            number_format($this->getOperation()->getWithdrawalAmount(),2, '.', '').
+            number_format($this->getOperation()->getCommissionAmount(),2, '.', '').
             $this->getOperation()->isCompletedString().
-            $this->getOperation()->getOriginalAmount().
+            number_format($this->getOperation()->getOriginalAmount(),2, '.', '').
             $this->getOperation()->getOriginalCurrency().
             $this->getOperation()->getDateTime()->format('Y-m-d H:i:s').
             $this->getOperation()->getRelatedNumber().
@@ -244,7 +244,6 @@ class Notification
             $this->getChannelId().
             $this->getChannelCountry().
             $this->getIpCountry();
-
         return hash('sha256', $sign);
     }
 

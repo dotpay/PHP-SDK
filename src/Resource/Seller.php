@@ -29,6 +29,7 @@ namespace Dotpay\Resource;
 
 use Dotpay\Loader\Loader;
 use Dotpay\Model\Configuration;
+use Dotpay\Model\PaymentLink;
 use Dotpay\Tool\Curl;
 use Dotpay\Model\Account;
 use Dotpay\Model\Operation;
@@ -204,6 +205,40 @@ class Seller extends Resource
     }
 
     /**
+     * Create a new payment link.
+     *
+     * @param SellerModel $seller Seller data
+     * @param PaymentLink $paymentLink Payment Link data
+     *
+     * @return array
+     */
+    public function getNewPaymentLink(SellerModel $seller, PaymentLink $paymentLink)
+    {
+        $data = $this->getDataForNewPaymentLink($paymentLink);
+        $result = $this->postData($this->getApiUrl('accounts/'.$seller->getId().'/payment_links/?format=json'), json_encode($data));
+
+        return $result;
+    }
+
+    /**
+     * Delete a payment link.
+     *
+     * @param SellerModel $seller Seller data
+     * @param string $token Token of payment link to delete
+     *
+     * @return array
+     */
+    public function deletePaymentLink(SellerModel $seller, $token)
+    {
+
+        $result = $this->deleteData($this->getApiUrl('accounts/'.$seller->getId().'/payment_links/'.$token."/"));
+
+        return $result;
+    }
+
+
+
+    /**
      * Realize a refund for the given model.
      *
      * @param Refund $refund Refund data
@@ -252,6 +287,46 @@ class Seller extends Resource
             ];
         }
 
+        return $data;
+    }
+
+    /**
+     * Return a data which can be used to creating a payment link through Dotpay server.
+     *
+     * @param PaymentLink $paymentLink Payment link data
+     *
+     * @return array
+     */
+    private function getDataForNewPaymentLink(PaymentLink $paymentLink)
+    {
+        $data = [
+            'amount' => $paymentLink->getAmount(),
+            'currency' => $paymentLink->getCurrency(),
+            'description' => $paymentLink->getDescription(),
+            'control' => $paymentLink->getControl(),
+            'language' => $paymentLink->getLanguage(),
+            'ignore_last_payment_channel' => $paymentLink->getIgnoreLastPaymentChannel(),
+            'type' => $paymentLink->getType(),
+            'url' => $paymentLink->getUrl(),
+            'urlc' => $paymentLink->getUrlc(),
+            'payer' => [
+                'first_name' => $paymentLink->getPayer()->getFirstName(),
+                'last_name' => $paymentLink->getPayer()->getLastName(),
+                'email' => $paymentLink->getPayer()->getEmail(),
+                'phone' => $paymentLink->getPayer()->getPhone(),
+            ]
+
+        ];
+        if($paymentLink->getPayer()->isAddressAvailable())
+        {
+            $data['payer']['address'] = [
+                'street' => $paymentLink->getPayer()->getStreet(),
+                'building_number' => $paymentLink->getPayer()->getBuildingNumber(),
+                'postcode' => $paymentLink->getPayer()->getPostCode(),
+                'city' => $paymentLink->getPayer()->getCity(),
+                'country' => $paymentLink->getPayer()->getCountry()
+            ];
+        }
         return $data;
     }
 
@@ -325,6 +400,8 @@ class Seller extends Resource
         } catch (UnauthorizedException $e) {
             return false;
         } catch (AccountNotFoundException $e) {
+            return false;
+        } catch (\Exception $e) {
             return false;
         }
         if ($account->getId() === (int) $id && $account->getPin() === $pin) {

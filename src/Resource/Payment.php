@@ -112,6 +112,10 @@ class Payment extends Resource
      */
     public function checkSeller($id, Request $request = null)
     {
+        if($id === null)
+        {
+            return false;
+        }
         if ($request === null) {
             $request = Request::getFromSellerId($id, $this->config->getTestMode());
         }

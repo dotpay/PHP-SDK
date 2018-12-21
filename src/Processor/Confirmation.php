@@ -168,7 +168,9 @@ class Confirmation
              $_SERVER['REQUEST_METHOD'] == 'GET'
         ) {
             $this->completeInformations();
-            throw new ConfirmationInfoException($this->outputMessage);
+
+            die($this->outputMessage);
+            //throw new ConfirmationInfoException($this->outputMessage);
         }
 
         $this->checkIp();

@@ -25,22 +25,61 @@
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 
-namespace Dotpay\Validator;
+namespace Dotpay\Provider;
+
+use Dotpay\Model\Payer;
 
 /**
- * The validator checks if the given building number is correct.
+ * Interface of operation data providers from shop.
  */
-class BNumber implements IValidate
+interface PaymentLinkProviderInterface
 {
     /**
-     * Validate the given value if it's correct.
+     * Return an identifier of a type of the operation.
      *
-     * @param mixed $value The given value
+     * @return string
+     */
+    public function getType();
+
+    /**
+     * Return a transaction amount.
+     *
+     * @return float|null
+     */
+    public function getAmount();
+
+    /**
+     * Return a code of a transaction currency.
+     *
+     * @return string
+     */
+    public function getCurrency();
+
+    /**
+     * Return a value which was given during making a payment.
+     *
+     * @return mixed
+     */
+    public function getControl();
+
+    /**
+     * Return a description of the operation.
+     *
+     * @return string
+     */
+    public function getDescription();
+
+    /**
+     * Return an email of payer.
+     *
+     * @return Payer
+     */
+    public function getPayer();
+
+    /**
+     * Return the ignore_last_payment_channel flag.
      *
      * @return bool
      */
-    public static function validate($value)
-    {
-        return (bool) preg_match('/^[\p{L}0-9\s\-_]{0,30}$/', $value);
-    }
+    public function getIgnoreLastPaymentChannel();
 }

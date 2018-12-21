@@ -153,6 +153,22 @@ abstract class Resource
     }
 
     /**
+     * Send a delete request to the destination point and return a response.
+     *
+     * @param string $url  Url of a destination request
+     *
+     * @return array
+     */
+    protected function deleteData($url)
+    {
+        $this->curl
+            ->addOption(CURLOPT_CUSTOMREQUEST, "DELETE")
+            ->addOption(CURLOPT_USERPWD, $this->config->getUsername().':'.$this->config->getPassword());
+
+        return $this->getContent($url, false);
+    }
+
+    /**
      * Return a string which contain a header with Accept rule.
      *
      * @return string

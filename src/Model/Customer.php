@@ -62,6 +62,8 @@ class Customer extends Payer
         'ru',
         'hu',
 	    'ro',
+        'uk',
+        'sk',
     );
 
     /**
@@ -121,7 +123,7 @@ class Customer extends Payer
 
         if($provider->isAddressAvailable()) {
             $customer->setStreet($provider->getStreet())
-                     ->setBuildingNumber($provider->getBuildingNumber())
+                     ->setBuildingNumber($provider->getBuildingNumber(), $provider->getStreet())
                      ->setPostCode($provider->getPostCode())
                      ->setCity($provider->getCity())
                      ->setCountry($provider->getCountry())
@@ -255,9 +257,10 @@ class Customer extends Payer
      *
      * @throws BNumberException Thrown when the given building number is incorrect
      */
-    public function setBuildingNumber($buildingNumber)
+    public function setBuildingNumber($buildingNumber, $street = null)
     {
-        $buildingNumber = $this->extractBnFromStreet($buildingNumber);
+        $buildingNumber = $this->extractBnFromStreet($buildingNumber, $street);
+
         if (!BNumber::validate($buildingNumber)) {
             throw new BNumberException($buildingNumber);
         }
@@ -380,13 +383,13 @@ class Customer extends Payer
     /**
      * Try to extract a building number from the street name if it's an empty field.
      */
-    private function extractBnFromStreet($buildingNumber)
+    private function extractBnFromStreet($buildingNumber, $street = null)
     {
+        if(is_null($street))
         $street = $this->street;
         if (empty($buildingNumber) && !empty($street)) {
 
             preg_match("/\s[\p{L}0-9\s\-_\/]{1,15}$/u", $street, $matches);
-
             if (count($matches) > 0) {
 
                 $buildingNumber = preg_replace('/[^\p{L}0-9\s\-_\/]/u','',trim($matches[0]));
@@ -400,6 +403,7 @@ class Customer extends Payer
         } else {
             $street = trim(preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street));
         }
+
         return $buildingNumber;
     }
 

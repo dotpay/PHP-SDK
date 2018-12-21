@@ -47,7 +47,7 @@ class Configuration
     /**
      * Version of the SDK.
      */
-    const SDK_VERSION = '1.0.12';
+    const SDK_VERSION = '1.0.13';
 
     const DOTPAY_SSL_URL = 'https://ssl.dotpay.pl';
 
@@ -885,7 +885,7 @@ class Configuration
      * @throws IdException Thrown when the given seller id is incorrect
      */
     public function setId($id)
-    {//var_dump($this->getEnable());die();
+    {
         if (!Id::validate($id) && ($this->getEnable() || !empty($id))) {
             throw new IdException($id);
         }
