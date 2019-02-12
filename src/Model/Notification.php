@@ -220,8 +220,8 @@ class Notification
             $this->getOperation()->getStatus().
             number_format($this->getOperation()->getAmount(),2, '.', '').
             $this->getOperation()->getCurrency().
-            number_format($this->getOperation()->getWithdrawalAmount(),2, '.', '').
-            number_format($this->getOperation()->getCommissionAmount(),2, '.', '').
+            (is_null($this->getOperation()->getWithdrawalAmount()) ? null : number_format($this->getOperation()->getWithdrawalAmount(),2, '.', '')).
+            (is_null($this->getOperation()->getCommissionAmount()) ? null : number_format($this->getOperation()->getCommissionAmount(),2, '.', '')).
             $this->getOperation()->isCompletedString().
             number_format($this->getOperation()->getOriginalAmount(),2, '.', '').
             $this->getOperation()->getOriginalCurrency().
