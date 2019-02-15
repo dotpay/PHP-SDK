@@ -25,34 +25,23 @@
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 
-namespace Dotpay\Action;
-
-use Dotpay\Model\CreditCard;
+namespace Dotpay\Tool\StringFormatter;
 
 /**
- * Action which is executed during updating informations about credit card.
+ * The formatter transforms a "name" value so that it passes validation.
  */
-class UpdateCcInfo extends Action
+class Name implements StringFormatterInterface
 {
-    /**
-     * Return a credit card which is set as an argument for a callback.
-     *
-     * @return CreditCard
-     */
-    public function getCreditCard()
-    {
-        return $this->getOneArgument();
-    }
 
     /**
-     * Set a credit card which can be passed to callback function.
+     * Format given value so that it passes validation process
      *
-     * @param CreditCard|null $cc Credit card object
+     * @param string $value The given value
      *
-     * @return UpdateCcInfo
+     * @return string
      */
-    public function setCreditCard(CreditCard $cc = null)
+    public static function format($value)
     {
-        return $this->setOneArgument($cc);
+        return preg_replace('/[^\p{L}\s\-_ ]/u',' ',$value);
     }
 }

@@ -101,7 +101,6 @@ class RegisterOrder extends Resource
                     $resultArray['operation']['payment_method']['channel_id']
                 )
         );
-
         $result = new Result(
                 $resultArray['info']['status_url'], $operation
         );
@@ -139,6 +138,7 @@ class RegisterOrder extends Resource
             $instruction = $this->loader->get('Instruction');
             $instruction->setOrderId($channel->getTransaction()->getPayment()->getId())
                     ->setNumber($resultArray['operation']['number'])
+                    ->setTitle($resultArray['instruction']['title'])
                     ->setChannel($resultArray['operation']['payment_method']['channel_id'])
                     ->setHash($this->getHashFromResultArray($resultArray))
                     ->setAmount($resultObject->getOperation()->getAmount())

@@ -45,10 +45,6 @@ use Dotpay\Exception\Processor\ConfirmationInfoException;
  */
 class Confirmation
 {
-    /**
-     * @var string Container of a collected message
-     */
-    private $outputMessage;
 
     /**
      * @var Configuration Object of Dotpay configuration
@@ -102,7 +98,6 @@ class Confirmation
         $this->config = $config;
         $this->paymentApi = $paymentApi;
         $this->sellerApi = $sellerApi;
-        $this->outputMessage = '';
     }
 
     /**
@@ -162,16 +157,6 @@ class Confirmation
         $this->payment = $payment;
         $this->notification = $notification;
         $config = $this->config;
-        if ((IpDetector::detect($this->config) == $config::OFFICE_IP ||
-              ($this->config->getTestMode() &&
-               IpDetector::detect($this->config) == $config::LOCAL_IP)) &&
-             $_SERVER['REQUEST_METHOD'] == 'GET'
-        ) {
-            $this->completeInformations();
-
-            die($this->outputMessage);
-            //throw new ConfirmationInfoException($this->outputMessage);
-        }
 
         $this->checkIp();
         $this->checkMethod();
@@ -187,65 +172,6 @@ class Confirmation
             default:
                 return false;
         }
-    }
-
-    /**
-     * Collect informations about shop which can be displayed for diagnostic.
-     */
-    protected function completeInformations()
-    {
-        $config = $this->config;
-        $this->addOutputMessage('--- Dotpay Diagnostic Information ---')
-             ->addOutputMessage('Sdk Version: '.$config::SDK_VERSION)
-             ->addOutputMessage('Enabled: '.(int) $config->getEnable(), true)
-             ->addOutputMessage('--- Dotpay PLN ---')
-             ->addOutputMessage('Id: '.$config->getId())
-             ->addOutputMessage('Correct Id: '.(int) $this->paymentApi->checkSeller($config->getId()))
-             ->addOutputMessage('Correct Pin: '.(int) $this->sellerApi->checkPin())
-             ->addOutputMessage('API Version: '.$config->getApi())
-             ->addOutputMessage('Test Mode: '.(int) $config->getTestMode())
-             ->addOutputMessage('Refunds: '.(int) $config->getRefundsEnable())
-             ->addOutputMessage('Widget: '.(int) $config->getWidgetVisible())
-             ->addOutputMessage('Widget currencies: '.$config->getWidgetCurrencies())
-             ->addOutputMessage('Instructions: '.(int) $config->getInstructionVisible(), true)
-             ->addOutputMessage('--- Separate Channels ---')
-             ->addOutputMessage('One Click: '.(int) $config->getOcVisible())
-             ->addOutputMessage('Credit Card: '.(int) $config->getCcVisible())
-             ->addOutputMessage('MasterPass: '.(int) $config->getMpVisible())
-             ->addOutputMessage('Blik: '.(int) $config->getBlikVisible(), true)
-             ->addOutputMessage('--- Dotpay FCC ---')
-             ->addOutputMessage('FCC Mode: '.(int) $config->getFccVisible())
-             ->addOutputMessage('FCC Id: '.$config->getFccId())
-             ->addOutputMessage('FCC Correct Id: '.(int) $this->paymentApi->checkSeller($config->getFccId()))
-             ->addOutputMessage('FCC Correct Pin: '.(int) $this->sellerApi->checkFccPin())
-             ->addOutputMessage('FCC Currencies: '.$config->getFccCurrencies(), true)
-             ->addOutputMessage('--- Dotpay API ---')
-             ->addOutputMessage('Data: '.(($config->isGoodApiData()) ? '<given>' : '<empty>'))
-             ->addOutputMessage('Login: '.$config->getUsername());
-        try {
-            $isAccountRight = $this->sellerApi->isAccountRight();
-        } catch (\Exception $ex) {
-            $isAccountRight = false;
-        }
-        $this->addOutputMessage('Correct data: '.$isAccountRight, true);
-    }
-
-    /**
-     * Add a new message to te collector.
-     *
-     * @param string $message      Message to add
-     * @param bool   $endOfSection Flag if the given message is last in a section
-     *
-     * @return Confirmation
-     */
-    protected function addOutputMessage($message, $endOfSection = false)
-    {
-        $this->outputMessage .= $message.'<br />';
-        if ($endOfSection) {
-            $this->outputMessage .= '<br />';
-        }
-
-        return $this;
     }
 
     /**
@@ -352,24 +278,34 @@ class Confirmation
         $this->checkPaymentAmount();
         $operation = $this->notification->getOperation();
         if (
-           $operation->getStatus() == $operation::STATUS_COMPLETE &&
            $this->notification->getChannelId() == $config::OC_CHANNEL &&
            $this->updateCcAction !== null
           ) {
             $creditCard = null;
-            if ($this->notification->getCreditCard() !== null) {
-                $creditCard = $this->notification->getCreditCard();
-            } elseif($this->sellerApi->isAccountRight()) {
-                $operationFromApi = $this->sellerApi->getOperationByNumber($operation->getNumber());
-                $paymentMethod = $operationFromApi->getPaymentMethod();
-                if ($paymentMethod !== null && $paymentMethod->getDetailsType() == $paymentMethod::CREDIT_CARD) {
-                    $creditCard = $paymentMethod->getDetails();
+            if($operation->getStatus() == $operation::STATUS_COMPLETE)
+            {
+                if ($this->notification->getCreditCard() !== null) {
+                    $creditCard = $this->notification->getCreditCard();
+                    if($this->sellerApi->isAccountRight()) {
+                        $operationFromApi = $this->sellerApi->getOperationByNumber($operation->getNumber());
+                        $paymentMethod = $operationFromApi->getPaymentMethod();
+                        if ($paymentMethod !== null && $paymentMethod->getDetailsType() == $paymentMethod::CREDIT_CARD) {
+                            $creditCard = $paymentMethod->getDetails();
+                        }
+                    }
+                }
+
+                if ($creditCard !== null) {
+                    $this->updateCcAction->setCreditCard($creditCard);
+                    $this->updateCcAction->execute();
                 }
             }
-            if ($creditCard !== null) {
+            elseif ($operation->getStatus() == $operation::STATUS_REJECTED)
+            {
                 $this->updateCcAction->setCreditCard($creditCard);
                 $this->updateCcAction->execute();
             }
+
         }
         if ($this->makePaymentAction !== null) {
             $this->makePaymentAction->setOperation($operation);

@@ -25,34 +25,59 @@
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 
-namespace Dotpay\Action;
-
-use Dotpay\Model\CreditCard;
+namespace Dotpay\Provider;
 
 /**
- * Action which is executed during updating informations about credit card.
+ * Interface of notification data providers from shop.
  */
-class UpdateCcInfo extends Action
+interface CreditCardProviderInterface
 {
     /**
-     * Return a credit card which is set as an argument for a callback.
+     * Return a CardBrand object with details of a credit card brand.
      *
-     * @return CreditCard
+     * @return \Dotpay\Model\CardBrand
      */
-    public function getCreditCard()
-    {
-        return $this->getOneArgument();
-    }
+    public function getBrand();
 
     /**
-     * Set a credit card which can be passed to callback function.
+     * Return id of credit card issuer.
      *
-     * @param CreditCard|null $cc Credit card object
-     *
-     * @return UpdateCcInfo
+     * @return string
      */
-    public function setCreditCard(CreditCard $cc = null)
-    {
-        return $this->setOneArgument($cc);
-    }
+    public function getIssuerId();
+
+    /**
+     * Return a masked number of the credt card.
+     *
+     * @return string
+     */
+    public function getMask();
+
+    /**
+     * Return a unique identifier of the credit card.
+     *
+     * @return int
+     */
+    public function getUniqueId();
+
+    /**
+     * Return an identificator of credit card which is assigned by Dotpay system.
+     *
+     * @return string
+     */
+    public function getCardId();
+
+    /**
+     * Return credit card's expiration year.
+     *
+     * @return string
+     */
+    public function getExpirationYear();
+
+    /**
+     * Return credit card's expiration month.
+     *
+     * @return string
+     */
+    public function getExpirationMonth();
 }

@@ -28,6 +28,7 @@
 namespace Dotpay\Model;
 
 use DateTime;
+use Dotpay\Provider\CreditCardProviderInterface;
 use Dotpay\Validator\CardMask;
 use Dotpay\Validator\Url;
 use Dotpay\Exception\BadParameter\CardMaskException;
@@ -42,6 +43,11 @@ class CreditCard
      * @var int|null Id of credit card in a shop
      */
     private $id = null;
+
+    /**
+     * @var string|null Credit card unique identifier
+     */
+    private $uniqueId = null;
 
     /**
      * @var string Card masked number
@@ -69,6 +75,16 @@ class CreditCard
     private $issuerId = '';
 
     /**
+     * @var string Card expiration year
+     */
+    private $expirationYear = '';
+
+    /**
+     * @var string Card expiration month
+     */
+    private $expirationMonth = '';
+
+    /**
      * @var string Customer hash
      */
     private $customerHash = '';
@@ -87,6 +103,27 @@ class CreditCard
      * @var int|null Id of the first order made using the card
      */
     private $orderId = null;
+
+    /**
+     * Create the model based on data provided from shop.
+     *
+     * @param CreditCardProviderInterface $provider Provider which contains data from shop application
+     *
+     * @return CreditCard
+     */
+    public static function createFromData(CreditCardProviderInterface $provider)
+    {
+        $creditCard = new static(null, null);
+        $creditCard->setCardId($provider->getCardId())
+            ->setMask($provider->getMask())
+            ->setIssuerId($provider->getIssuerId())
+            ->setUniqueId($provider->getUniqueId())
+            ->setExpirationYear($provider->getExpirationYear())
+            ->setExpirationMonth($provider->getExpirationMonth())
+            ->setBrand($provider->getBrand());
+
+        return $creditCard;
+    }
 
     /**
      * Initialize the model.
@@ -111,6 +148,16 @@ class CreditCard
     }
 
     /**
+     * Return a unique credit card identifier.
+     *
+     * @return string|null
+     */
+    public function getUniqueId()
+    {
+        return $this->uniqueId;
+    }
+
+    /**
      * Return a card masked number.
      *
      * @return string
@@ -118,6 +165,16 @@ class CreditCard
     public function getMask()
     {
         return $this->mask;
+    }
+
+    /**
+     * Return an unformatted card masked number.
+     *
+     * @return string
+     */
+    public function getUnformattedMask()
+    {
+        return str_replace('-', ' ', strtoupper($this->mask));
     }
 
     /**
@@ -222,6 +279,20 @@ class CreditCard
     public function setId($id)
     {
         $this->id = (int) $id;
+
+        return $this;
+    }
+
+    /**
+     * Set an unique id of credit card.
+     *
+     * @param string $uniqueId Unique id of credit card
+     *
+     * @return CreditCard
+     */
+    public function setUniqueId($uniqueId)
+    {
+        $this->uniqueId = (string) $uniqueId;
 
         return $this;
     }
@@ -362,6 +433,54 @@ class CreditCard
 
         return $this;
     }
+
+    /**
+     * Get card's expiration year.
+     *
+     * @return string
+     */
+    public function getExpirationYear()
+    {
+        return $this->expirationYear;
+    }
+
+    /**
+     * Set card's expiration year.
+     *
+     * @param string $expirationYear
+     *
+     * @return CreditCard
+     */
+    public function setExpirationYear($expirationYear)
+    {
+        $this->expirationYear = $expirationYear;
+        return $this;
+    }
+
+    /**
+     * Get card's expiration month.
+     *
+     * @return string
+     */
+    public function getExpirationMonth()
+    {
+        return $this->expirationMonth;
+    }
+
+    /**
+     * Set card's expiration month.
+     *
+     * @param string $expirationMonth
+     *
+     * @return CreditCard
+     */
+    public function setExpirationMonth($expirationMonth)
+    {
+        $this->expirationMonth = $expirationMonth;
+        return $this;
+    }
+
+
 
     /**
      * Return credit card which is connected with the given order id. This function is a mock and it should be overwritten in a children CreditCard class.

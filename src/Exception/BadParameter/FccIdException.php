@@ -25,34 +25,15 @@
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 
-namespace Dotpay\Action;
-
-use Dotpay\Model\CreditCard;
+namespace Dotpay\Exception\BadParameter;
 
 /**
- * Action which is executed during updating informations about credit card.
+ * Incorrect seller id fo foreign currencies.
  */
-class UpdateCcInfo extends Action
+class FccIdException extends \Dotpay\Exception\DotpayException
 {
     /**
-     * Return a credit card which is set as an argument for a callback.
-     *
-     * @return CreditCard
+     * Message of error thrown by the exception.
      */
-    public function getCreditCard()
-    {
-        return $this->getOneArgument();
-    }
-
-    /**
-     * Set a credit card which can be passed to callback function.
-     *
-     * @param CreditCard|null $cc Credit card object
-     *
-     * @return UpdateCcInfo
-     */
-    public function setCreditCard(CreditCard $cc = null)
-    {
-        return $this->setOneArgument($cc);
-    }
+    const MESSAGE = 'Incorrect seller id for foreign currencies: %1';
 }

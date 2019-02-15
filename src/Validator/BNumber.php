@@ -41,6 +41,6 @@ class BNumber implements IValidate
      */
     public static function validate($value)
     {
-        return (bool) preg_match('/^[\p{L}0-9\s\-_]{0,30}$/', $value);
+        return (bool) preg_match('/^[\p{L}0-9\s\-\/_]{0,30}$/', $value);
     }
 }

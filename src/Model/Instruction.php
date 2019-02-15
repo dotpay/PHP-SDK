@@ -120,6 +120,7 @@ class Instruction
         $instruction->setId($provider->getId())
                     ->setOrderId($provider->getOrderId())
                     ->setNumber($provider->getNumber())
+                    ->setTitle($provider->getTitle())
                     ->setBankAccount($provider->getBankAccount())
                     ->setChannel($provider->getChannel())
                     ->setHash($provider->getHash())
@@ -207,6 +208,16 @@ class Instruction
     public function getCurrency()
     {
         return $this->currency;
+    }
+
+    /**
+     * Return a transfer title.
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     /**
@@ -418,6 +429,20 @@ class Instruction
             throw new CurrencyException($correctCurrency);
         }
         $this->currency = (string) $correctCurrency;
+
+        return $this;
+    }
+
+    /**
+     * Set a transfer title.
+     *
+     * @param string $title Title of the transfer
+     *
+     * @return Instruction
+     */
+    public function setTitle($title)
+    {
+        $this->title = (string) $title;
 
         return $this;
     }

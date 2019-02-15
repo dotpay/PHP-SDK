@@ -103,6 +103,9 @@ class Notification
         if ($provider->getIpCountry() !== null) {
             $notification->setIpCountry($provider->getIpCountry());
         }
+        if ($provider->getCreditCard() !== null) {
+            $notification->setCreditCard($provider->getCreditCard());
+        }
         $notification->setSignature($provider->getSignature());
 
         return $notification;
@@ -218,12 +221,12 @@ class Notification
             $this->getOperation()->getNumber().
             $this->getOperation()->getType().
             $this->getOperation()->getStatus().
-            number_format($this->getOperation()->getAmount(),2, '.', '').
+            (is_null($this->getOperation()->getAmount()) ? null : number_format($this->getOperation()->getAmount(),2, '.', '')).
             $this->getOperation()->getCurrency().
             (is_null($this->getOperation()->getWithdrawalAmount()) ? null : number_format($this->getOperation()->getWithdrawalAmount(),2, '.', '')).
             (is_null($this->getOperation()->getCommissionAmount()) ? null : number_format($this->getOperation()->getCommissionAmount(),2, '.', '')).
             $this->getOperation()->isCompletedString().
-            number_format($this->getOperation()->getOriginalAmount(),2, '.', '').
+            (is_null($this->getOperation()->getOriginalAmount()) ? null : number_format($this->getOperation()->getOriginalAmount(),2, '.', '')).
             $this->getOperation()->getOriginalCurrency().
             $this->getOperation()->getDateTime()->format('Y-m-d H:i:s').
             $this->getOperation()->getRelatedNumber().
@@ -235,15 +238,19 @@ class Notification
         if ($this->getCreditCard() !== null) {
             $sign .=
                 $this->getCreditCard()->getIssuerId().
-                $this->getCreditCard()->getMask().
+                $this->getCreditCard()->getUnformattedMask().
+                $this->getCreditCard()->getExpirationYear().
+                $this->getCreditCard()->getExpirationMonth().
                 $this->getCreditCard()->getBrand()->getCodeName().
                 $this->getCreditCard()->getBrand()->getName().
+                $this->getCreditCard()->getUniqueId().
                 $this->getCreditCard()->getCardId();
         }
         $sign .=
             $this->getChannelId().
             $this->getChannelCountry().
             $this->getIpCountry();
+
         return hash('sha256', $sign);
     }
 

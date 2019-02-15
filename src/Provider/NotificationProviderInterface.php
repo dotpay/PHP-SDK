@@ -40,6 +40,13 @@ interface NotificationProviderInterface
     public function getOperation();
 
     /**
+     * Return a CreditCard object with details of operation which relates the notification.
+     *
+     * @return \Dotpay\Model\CreditCard
+     */
+    public function getCreditCard();
+
+    /**
      * Return an email of a seller.
      *
      * @return string

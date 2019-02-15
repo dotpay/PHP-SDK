@@ -87,4 +87,11 @@ interface InstructionProviderInterface
      * @return string
      */
     public function getCurrency();
+
+    /**
+     * Return a title of payment.
+     *
+     * @return string
+     */
+    public function getTitle();
 }

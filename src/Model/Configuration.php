@@ -28,6 +28,8 @@
 namespace Dotpay\Model;
 
 use DateTime;
+use Dotpay\Exception\BadParameter\FccIdException;
+use Dotpay\Exception\BadParameter\FccPinException;
 use Dotpay\Provider\ConfigurationProviderInterface;
 use Dotpay\Validator\Id;
 use Dotpay\Validator\Pin;
@@ -47,7 +49,7 @@ class Configuration
     /**
      * Version of the SDK.
      */
-    const SDK_VERSION = '1.0.14';
+    const SDK_VERSION = '1.0.15';
 
     const DOTPAY_SSL_URL = 'https://ssl.dotpay.pl';
 
@@ -287,6 +289,11 @@ class Configuration
      * @var string Payment API version
      */
     private $api = 'dev';
+
+    /**
+     * @var array Array of validation errors with provided data
+     */
+    private $errors = [];
 
     /**
      * Create the model based on data provided from shop.
@@ -798,7 +805,7 @@ class Configuration
             case $this->getFccId():
                 return new Seller($this->getFccId(), $this->getFccPin(), $this->getTestMode());
             default:
-                throw new SellerNotFoundException($sellerId);
+                $this->addError(new SellerNotFoundException($sellerId));
         }
     }
 
@@ -887,7 +894,8 @@ class Configuration
     public function setId($id)
     {
         if (!Id::validate($id) && ($this->getEnable() || !empty($id))) {
-            throw new IdException($id);
+            $this->addError(new IdException($id));
+            return $this;
         }
         $this->id = (int) $id;
 
@@ -906,7 +914,8 @@ class Configuration
     public function setPin($pin)
     {
         if (!Pin::validate($pin) && ($this->getEnable() || !empty($pin))) {
-            throw new PinException($pin);
+            $this->addError(new PinException($pin));
+            return $this;
         }
         $this->pin = (string) $pin;
 
@@ -925,7 +934,8 @@ class Configuration
     public function setUsername($username)
     {
         if (!empty($username) && !Username::validate($username)) {
-            throw new UsernameException($username);
+            $this->addError(new UsernameException($username));
+            return $this;
         }
         $this->username = (string) $username;
 
@@ -944,7 +954,8 @@ class Configuration
     public function setPassword($password)
     {
         if (!empty($password) && empty($password)) {
-            throw new PasswordException();
+            $this->addError(new PasswordException());
+            return $this;
         }
         $this->password = (string) $password;
 
@@ -1034,7 +1045,8 @@ class Configuration
     {
         if ($this->getFccVisible()) {
             if (!empty($fcc) && !Id::validate($fccId)) {
-                throw new IdException($fccId);
+                $this->addError(new FccIdException($fccId));
+                return $this;
             }
             $this->fccId = (int) $fccId;
         }
@@ -1055,7 +1067,8 @@ class Configuration
     {
         if ($this->getFccVisible()) {
             if (!empty($fccPin) && !Pin::validate($fccPin)) {
-                throw new PinException($fccPin);
+                $this->addError(new FccPinException($fccPin));
+                return $this;
             }
             $this->fccPin = (string) $fccPin;
         }
@@ -1309,7 +1322,8 @@ class Configuration
     public function setApi($api)
     {
         if ($api !== 'dev') {
-            throw new ApiVersionException($api);
+            $this->addError(new ApiVersionException($api));
+            return $this;
         }
         $this->api = $api;
 
@@ -1349,6 +1363,30 @@ class Configuration
         }
 
         return $result;
+    }
+
+    /**
+     * Add an Exception to errors array
+     *
+     * @param \Exception $e Exception to be added
+     *
+     * @return Configuration
+     */
+    public function addError($e)
+    {
+        $this->errors[$e->getMessage()] = $e;
+
+        return $this;
+    }
+
+    /**
+     * Return aa array of validation errors.
+     *
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 
     /**
