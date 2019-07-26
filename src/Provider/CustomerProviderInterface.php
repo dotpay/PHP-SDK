@@ -115,4 +115,60 @@ interface CustomerProviderInterface
      * @return boolean
      */
     public function isAddressAvailable();
+
+    /**
+     * Return date of user registration
+     *
+     * @return \DateTime|null
+     */
+    public function getRegisteredSince();
+
+    /**
+     * Return number of user's orders
+     *
+     * @return int
+     */
+    public function getOrderCount();
+
+    /**
+     * Return chosen type of delivery
+     *
+     * @return string|null
+     */
+    public function getDeliveryType();
+
+    /**
+     * Return a shipping street name of the customer.
+     *
+     * @return string
+     */
+    public function getShippingStreet();
+
+    /**
+     * Return a shipping building number of the customer.
+     *
+     * @return string
+     */
+    public function getShippingBuildingNumber();
+
+    /**
+     * Return a shipping post code of the customer.
+     *
+     * @return string
+     */
+    public function getShippingPostCode();
+
+    /**
+     * Return a shipping city of the customer.
+     *
+     * @return string
+     */
+    public function getShippingCity();
+
+    /**
+     * Return a shipping country of the customer.
+     *
+     * @return string
+     */
+    public function getShippingCountry();
 }

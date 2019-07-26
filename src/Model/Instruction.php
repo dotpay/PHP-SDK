@@ -53,7 +53,7 @@ class Instruction
     /**
      * Street of the recipient of payment.
      */
-    const RECIPIENT_STREET = 'Wielicka 72';
+    const RECIPIENT_STREET = 'Wielicka 28B';
 
     /**
      * Post code and city of the recipient of payment.

@@ -37,7 +37,7 @@ interface PaymentLinkProviderInterface
     /**
      * Return an identifier of a type of the operation.
      *
-     * @return string
+     * @return int
      */
     public function getType();
 

@@ -348,7 +348,7 @@ class Channel
         $data['URLC'] = $this->transaction->getConfirmUrl();
         $data['api_version'] = $this->config->getApi();
         $data['type'] = 4;
-        $data['ch_lock'] = 1;
+        $data['ch_lock'] = 0;
         $data['firstname'] = $this->transaction->getCustomer()->getFirstName();
         $data['lastname'] = $this->transaction->getCustomer()->getLastName();
         $data['email'] = $this->transaction->getCustomer()->getEmail();
@@ -363,6 +363,7 @@ class Channel
         $data['bylaw'] = 1;
         $data['personal_data'] = 1;
         $data['channel'] = $this->getChannelId();
+        $data['customer'] = (string) $this->transaction->getCustomerAdditionalData();
 
         return $data;
     }
@@ -558,7 +559,8 @@ class Channel
             (isset($inputParameters['recurring_count']) ? $inputParameters['recurring_count'] : null).
             (isset($inputParameters['surcharge_amount']) ? $inputParameters['surcharge_amount'] : null).
             (isset($inputParameters['surcharge']) ? $inputParameters['surcharge'] : null).
-            (isset($inputParameters['ignore_last_payment_channel']) ? $inputParameters['ignore_last_payment_channel'] : null);
+            (isset($inputParameters['ignore_last_payment_channel']) ? $inputParameters['ignore_last_payment_channel'] : null).
+            (isset($inputParameters['customer']) ? $inputParameters['customer'] : null);
 
         foreach ($subPayments as $subPayment) {
             if ($subPayment instanceof Payment) {

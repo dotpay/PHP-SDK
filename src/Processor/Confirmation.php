@@ -323,9 +323,13 @@ class Confirmation
      */
     protected function makeRefund()
     {
-        $this->makeRefundAction->setOperation($this->notification->getOperation());
+        if($this->makeRefundAction !== null)
+        {
+            $this->makeRefundAction->setOperation($this->notification->getOperation());
+            return $this->makeRefundAction->execute();
+        }
 
-        return ($this->makeRefundAction !== null) ? $this->makeRefundAction->execute() : true;
+        return true;
     }
 
     /**

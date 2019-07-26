@@ -49,7 +49,7 @@ class Configuration
     /**
      * Version of the SDK.
      */
-    const SDK_VERSION = '1.0.15';
+    const SDK_VERSION = '1.0.16';
 
     const DOTPAY_SSL_URL = 'https://ssl.dotpay.pl';
 
@@ -135,9 +135,15 @@ class Configuration
         'SEK',
         'UAH',
         'RON',
-        'PLN'
+        'PLN',
+        'NOK',
+        'BGN',
+        'CHF',
+        'HRK',
+        'HUF',
+        'RUB'
     ];
-
+    
     /**
      * @var bool Flag which inform if other channels are enabled in a shop
      */

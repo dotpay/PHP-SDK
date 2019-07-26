@@ -255,7 +255,6 @@ class Seller extends Resource
                 'description' => $refund->getDescription(),
                 'control' => $refund->getControl(),
             ]));
-
             return true;
         } catch (ResourceNotFoundException $ex) {
             throw new OperationNotFoundException($refund->getPayment());
@@ -306,7 +305,7 @@ class Seller extends Resource
             'control' => $paymentLink->getControl(),
             'language' => $paymentLink->getLanguage(),
             'ignore_last_payment_channel' => $paymentLink->getIgnoreLastPaymentChannel(),
-            'type' => $paymentLink->getType(),
+            'redirection_type' => $paymentLink->getType(),
             'url' => $paymentLink->getUrl(),
             'urlc' => $paymentLink->getUrlc(),
             'payer' => [

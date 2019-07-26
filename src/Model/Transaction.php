@@ -46,6 +46,11 @@ class Transaction
     private $payment;
 
     /**
+     * @var CustomerAdditionalData CustomerAdditionalData model for the payment
+     */
+    private $customerAdditionalData;
+
+    /**
      * @var array Subpayments using in multimerchant functionality
      */
     private $subPayments = [];
@@ -80,6 +85,16 @@ class Transaction
     public function getCustomer()
     {
         return $this->customer;
+    }
+
+    /**
+     * Return customer additional data.
+     *
+     * @return CustomerAdditionalData
+     */
+    public function getCustomerAdditionalData()
+    {
+        return $this->customerAdditionalData;
     }
 
     /**
@@ -132,6 +147,20 @@ class Transaction
     public function setCustomer(Customer $customer)
     {
         $this->customer = $customer;
+
+        return $this;
+    }
+
+    /**
+     * Set a customer additional data field.
+     *
+     * @param CustomerAdditionalData $customerAdditionalData Customer additional data
+     *
+     * @return Transaction
+     */
+    public function setCustomerAdditionalData(CustomerAdditionalData $customerAdditionalData)
+    {
+        $this->customerAdditionalData = $customerAdditionalData;
 
         return $this;
     }

@@ -119,6 +119,7 @@ class PaymentLink
         $paymentLink = new static();
         $paymentLink
             ->setAmount($provider->getAmount())
+            ->setType($provider->getType())
             ->setCurrency($provider->getCurrency())
             ->setDescription($provider->getDescription())
             ->setControl($provider->getControl())
