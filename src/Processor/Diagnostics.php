@@ -80,6 +80,10 @@ class Diagnostics
         $this->sellerApi = $sellerApi;
         $this->outputMessage = '';
         $this->pluginInfo = $pluginInfo;
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+		$productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface'); 
+		$this->MagentoVersion = $productMetadata->getVersion();
     }
 
     /**
@@ -91,11 +95,8 @@ class Diagnostics
     public function execute()
     {
         $config = $this->config;
-        if ((IpDetector::detect($this->config) == $config::OFFICE_IP ||
-                ($this->config->getTestMode() &&
-                    IpDetector::detect($this->config) == $config::LOCAL_IP)) &&
-            $_SERVER['REQUEST_METHOD'] == 'GET'
-        ) {
+        if ((IpDetector::detect($this->config) == $config::OFFICE_IP ||  $_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP) && $_SERVER['REQUEST_METHOD'] == 'GET')
+         {
             $this->completeInformations();
 
             die($this->outputMessage);
@@ -106,13 +107,24 @@ class Diagnostics
         }
     }
 
+    protected function DotpayModuleInfo()
+    {
+                return $this->pluginInfo;
+
+        }
+
     /**
      * Collect informations about shop which can be displayed for diagnostic.
      */
     protected function completeInformations()
     {
         $config = $this->config;
-        $this->addOutputMessage('--- Dotpay Diagnostic Information ---')
+
+        $this->addOutputMessage('--- Platform Information ---')
+		->addOutputMessage('Magento Version: '.$this->MagentoVersion)
+        ->addOutputMessage('PHP Version: '.  phpversion());
+        
+        $this->addOutputMessage('<br><br>--- Dotpay Diagnostic Information ---')
             ->addOutputMessage('Sdk Version: '.$config::SDK_VERSION);
         if($this->pluginInfo)
         {
@@ -181,14 +193,9 @@ class Diagnostics
     {
         $config = $this->config;
         if (
-        !(IpDetector::detect($this->config) == $config::CALLBACK_IP ||
-            ($this->config->getTestMode() &&
-                (IpDetector::detect($this->config) == $config::OFFICE_IP ||
-                    IpDetector::detect($this->config) == $config::LOCAL_IP
-                )
-            )
-        )
-        ) {
+            !(IpDetector::detect($this->config) == $config::CALLBACK_IP || IpDetector::detect($this->config) == $config::OFFICE_IP)
+           ) 
+        {
             throw new ConfirmationDataException('ERROR (REMOTE ADDRESS: '.IpDetector::detect($this->config).')');
         }
 

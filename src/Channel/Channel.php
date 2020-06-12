@@ -45,6 +45,7 @@ use Dotpay\Html\Container\Script;
 use Dotpay\Html\PlainText;
 use Dotpay\Html\Container\Form;
 
+
 /**
  * Class provides a special functionality for customization of payments channel.
  */
@@ -61,6 +62,11 @@ class Channel
     const TRANSFER_GROUP = 'transfers';
 
     /**
+     * Last version number of the plugin
+     */
+    const DOTPAY_PLUGIN_VERSION = '1.0.17';
+
+    /**
      * @var int Code number of payment channel in Dotpay system
      */
     protected $code;
@@ -74,6 +80,7 @@ class Channel
      * @var Configuration Dotpay configuration object
      */
     protected $config;
+
 
     /**
      * @var \Dotpay\Resource\Channel\ChannelInfo A channel info struct, downloaded from Dotpay server
@@ -138,6 +145,7 @@ class Channel
         $this->chooseSeller();
         $this->transaction->getPayment()->setSeller($this->seller);
         $this->setChannelInfo($channelId);
+
     }
 
     /**
@@ -170,6 +178,8 @@ class Channel
             return null;
         }
     }
+
+
 
     /**
      * Return a code number of payment channel in Dotpay system.
@@ -329,9 +339,17 @@ class Channel
         if ($this->seller === null) {
             throw new SellerNotGivenException();
         }
+        
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+		$productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface'); 
+        $this->MagentoVersion = $productMetadata->getVersion();
+        
+        $newControl = 'tr_id:'.$this->transaction->getPayment()->getId().'|Magento: v'.$this->MagentoVersion.'|DP module: v'.self::DOTPAY_PLUGIN_VERSION;
         $data = [];
         $data['id'] = $this->seller->getId();
-        $data['control'] = $this->transaction->getPayment()->getId();
+        $data['control'] = $newControl;
+       // $data['control'] = $this->transaction->getPayment()->getId();
         $sellerInfo = $this->transaction->getPayment()->getSeller()->getInfo();
         if (!empty($sellerInfo)) {
             $data['p_info'] = $sellerInfo;
@@ -344,8 +362,8 @@ class Channel
         $data['currency'] = $this->transaction->getPayment()->getCurrency();
         $data['description'] = $this->transaction->getPayment()->getDescription();
         $data['lang'] = $this->transaction->getCustomer()->getLanguage();
-        $data['URL'] = $this->transaction->getBackUrl();
-        $data['URLC'] = $this->transaction->getConfirmUrl();
+        $data['url'] = $this->transaction->getBackUrl();
+        $data['urlc'] = $this->transaction->getConfirmUrl();
         $data['api_version'] = $this->config->getApi();
         $data['type'] = 4;
         $data['ch_lock'] = 0;
@@ -364,7 +382,9 @@ class Channel
         $data['personal_data'] = 1;
         $data['channel'] = $this->getChannelId();
         $data['customer'] = (string) $this->transaction->getCustomerAdditionalData();
+        $data['ignore_last_payment_channel'] = 1;
 
+        
         return $data;
     }
 
@@ -392,7 +412,7 @@ class Channel
         foreach ($this->getAllHiddenFields() as $name => $value) {
             $fields[] = new Input('hidden', $name, (string) $value);
         }
-        $fields[] = new Script(new PlainText('setTimeout(function(){document.getElementsByClassName(\'dotpay-form\')[0].submit();}, 1);'));
+        $fields[] = new Script(new PlainText('setTimeout(function(){document.getElementsByClassName(\'dotpay-form\')[0].submit();}, 10);'));
         $form = new Form($fields);
 
         return $form->setClass('dotpay-form')
@@ -507,10 +527,10 @@ class Channel
             (isset($inputParameters['ch_lock']) ? $inputParameters['ch_lock'] : null).
             (isset($inputParameters['channel_groups']) ? $inputParameters['channel_groups'] : null).
             (isset($inputParameters['onlinetransfer']) ? $inputParameters['onlinetransfer'] : null).
-            (isset($inputParameters['URL']) ? $inputParameters['URL'] : null).
+            (isset($inputParameters['url']) ? $inputParameters['url'] : null).
             (isset($inputParameters['type']) ? $inputParameters['type'] : null).
             (isset($inputParameters['buttontext']) ? $inputParameters['buttontext'] : null).
-            (isset($inputParameters['URLC']) ? $inputParameters['URLC'] : null).
+            (isset($inputParameters['urlc']) ? $inputParameters['urlc'] : null).
             (isset($inputParameters['firstname']) ? $inputParameters['firstname'] : null).
             (isset($inputParameters['lastname']) ? $inputParameters['lastname'] : null).
             (isset($inputParameters['email']) ? $inputParameters['email'] : null).
@@ -560,7 +580,10 @@ class Channel
             (isset($inputParameters['surcharge_amount']) ? $inputParameters['surcharge_amount'] : null).
             (isset($inputParameters['surcharge']) ? $inputParameters['surcharge'] : null).
             (isset($inputParameters['ignore_last_payment_channel']) ? $inputParameters['ignore_last_payment_channel'] : null).
-            (isset($inputParameters['customer']) ? $inputParameters['customer'] : null);
+            (isset($inputParameters['customer']) ? $inputParameters['customer'] : null).
+			(isset($ParametersArray['gp_token']) ? $ParametersArray['gp_token'] : null).
+			(isset($ParametersArray['auto_reject_date']) ? $ParametersArray['auto_reject_date'] : null).    
+            (isset($ParametersArray['ap_token']) ? $ParametersArray['ap_token'] : null);
 
         foreach ($subPayments as $subPayment) {
             if ($subPayment instanceof Payment) {
