@@ -185,16 +185,11 @@ class Confirmation
     {
         $config = $this->config;
         if (
-            !(IpDetector::detect($this->config) == $config::CALLBACK_IP ||
-                ($this->config->getTestMode() &&
-                 (IpDetector::detect($this->config) == $config::OFFICE_IP ||
-                  IpDetector::detect($this->config) == $config::LOCAL_IP
-                 )
-                )
-            )
-        ) {
-            throw new ConfirmationDataException('ERROR (REMOTE ADDRESS: '.IpDetector::detect($this->config).')');
-        }
+            !(IpDetector::detect($this->config) == $config::CALLBACK_IP || $_SERVER['REMOTE_ADDR'] == $config::CALLBACK_IP || IpDetector::detect($this->config) == $config::OFFICE_IP || $_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP )
+           ) 
+            {
+                throw new ConfirmationDataException('ERROR (REMOTE ADDRESS: '.IpDetector::detect($this->config).'/'.$_SERVER['REMOTE_ADDR'].')');
+            }
 
         return true;
     }
