@@ -205,7 +205,7 @@ class RegisterOrder extends Resource
         if (!empty($channel->getTransaction()->getCustomer()->getBuildingNumber())) {
             $building_numberRO = $channel->getTransaction()->getCustomer()->getBuildingNumber();
         } else {
-            $building_numberRO = '0'; //this field may not be blank in register order.
+            $building_numberRO = ' '; //this field may not be blank in register order.
         }
 
         if ($this->isFilledAddress($channel)){

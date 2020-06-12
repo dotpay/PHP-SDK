@@ -339,12 +339,10 @@ class Customer extends Payer
     public function setPhone($phone)
     {
         if (!Phone::validate($phone)) {
-           // throw new PhoneException($phone);
-           $this->phone = null;
-        }else{
-            $this->phone = (string) $phone;
+            throw new PhoneException($phone);
         }
-        
+        $this->phone = (string) $phone;
+
         return $this;
     }
 

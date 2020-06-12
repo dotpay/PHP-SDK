@@ -80,7 +80,7 @@ class Seller extends Resource
             return false;
         }
         try {
-            $this->getDataFromApi('accounts/');
+            $this->getDataFromApi('payments/');
         } catch (UnauthorizedException $e) {
             return false;
         }
