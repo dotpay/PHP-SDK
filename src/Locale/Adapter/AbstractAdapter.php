@@ -204,7 +204,7 @@ abstract class AbstractAdapter
         if (strlen($str) <= $pos || $pos < 0) {
             return null;
         } else {
-            return $str{(int) $pos};
+            return $str[(int) $pos];
         }
     }
 }
