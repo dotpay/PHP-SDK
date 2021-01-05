@@ -49,7 +49,7 @@ class Configuration
     /**
      * Version of the SDK.
      */
-    const SDK_VERSION = '1.0.17';
+    const SDK_VERSION = '1.0.18';
 
     const DOTPAY_SSL_URL = 'https://ssl.dotpay.pl';
 
@@ -286,6 +286,14 @@ class Configuration
      */
     private $shopName = '';
 
+    private $storeName = '';
+
+    /**
+     * @var string Email of shop which is sent to Dotpay server
+     */
+    private $shopEmail = '';
+
+    private $storeEmail = '';
     /**
      * @var bool Flag if multimerchant option is enabled
      */
@@ -300,6 +308,9 @@ class Configuration
      * @var array Array of validation errors with provided data
      */
     private $errors = [];
+
+
+    private $controlDefault = false;
 
     /**
      * Create the model based on data provided from shop.
@@ -336,7 +347,11 @@ class Configuration
             ->setSurchargeAmount($provider->getSurchargeAmount())
             ->setSurchargePercent($provider->getSurchargePercent())
             ->setShopName($provider->getShopName())
+            ->setShopEmail($provider->getShopEmail())
             ->setMultimerchant($provider->getMultimerchant())
+            ->setStoreName($provider->getStoreName())
+            ->setStoreEmail($provider->getStoreEmail())
+            ->setControlDefault($provider->getControlDefault())
             ->setApi($provider->getApi());
 
         return $configuration;
@@ -608,6 +623,16 @@ class Configuration
     }
 
     /**
+     * Check if payment instruction of cash or transfer channels should be visible on a shop site.
+     *
+     * @return bool
+     */
+    public function getControlDefault()
+    {
+        return $this->controlDefault;
+    }
+
+    /**
      * Check if refunds requesting is enabled from a shop system.
      *
      * @return bool
@@ -691,6 +716,26 @@ class Configuration
     public function getShopName()
     {
         return $this->shopName;
+    }
+
+    public function getStoreName()
+    {
+        return $this->storeName;
+    }
+
+    /**
+     * Return a email of shop which is sent to Dotpay server.
+     *
+     * @return string
+     */
+    public function getShopEmail()
+    {
+        return $this->shopEmail;
+    }
+
+    public function getStoreEmail()
+    {
+        return $this->storeEmail;
     }
 
     /**
@@ -1199,6 +1244,20 @@ class Configuration
     }
 
     /**
+     * Set a flag if Control field with additional information (default)
+     *
+     * @param bool $controlDefault Flag if Control field with additional information (default)
+     *
+     * @return Configuration
+     */
+    public function setControlDefault($controlDefault)
+    {
+        $this->controlDefault = (bool) $controlDefault;
+
+        return $this;
+    }
+
+    /**
      * Set a flag if refunds requesting is enabled from a shop system.
      *
      * @param bool $refundsEnable Flag of refunds enabling from shop sites
@@ -1298,6 +1357,34 @@ class Configuration
     public function setShopName($shopName)
     {
         $this->shopName = (string) $shopName;
+
+        return $this;
+    }
+
+    public function setStoreName($storeName)
+    {
+        $this->storeName = (string) $storeName;
+
+        return $this;
+    }
+
+    /**
+     * Set the given email of shop which is sent to Dotpay server.
+     *
+     * @param string $shopEmail Shop email
+     *
+     * @return Configuration
+     */
+    public function setShopEmail($shopEmail)
+    {
+        $this->shopEmail = (string) $shopEmail;
+
+        return $this;
+    }
+    
+    public function setStoreEmail($storeEmail)
+    {
+        $this->storeEmail = (string) $storeEmail;
 
         return $this;
     }

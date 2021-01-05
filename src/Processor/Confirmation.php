@@ -220,7 +220,8 @@ class Confirmation
     protected function checkSignature()
     {
         if ($this->notification->calculateSignature($this->getSeller()->getPin()) != $this->notification->getSignature()) {
-            throw new ConfirmationDataException('ERROR SIGNATURE - CHECK PIN');
+              throw new ConfirmationDataException('ERROR SIGNATURE - CHECK PIN');
+          //  throw new ConfirmationDataException('ERROR SIGNATURE - CHECK PIN:'.$this->notification->calculateSignature($this->getSeller()->getPin(),'check')); // for debug ONLY!
         }
 
         return true;
@@ -279,8 +280,8 @@ class Confirmation
             $creditCard = null;
             if($operation->getStatus() == $operation::STATUS_COMPLETE)
             {
-                if ($this->notification->getCreditCard() !== null) {
-                    $creditCard = $this->notification->getCreditCard();
+                if ($this->notification->getCreditCard() == null) {
+                    $creditCard = $this->notification->getCreditCard();               
                     if($this->sellerApi->isAccountRight()) {
                         $operationFromApi = $this->sellerApi->getOperationByNumber($operation->getNumber());
                         $paymentMethod = $operationFromApi->getPaymentMethod();

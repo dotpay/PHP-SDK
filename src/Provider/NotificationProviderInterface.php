@@ -81,6 +81,22 @@ interface NotificationProviderInterface
      */
     public function getIpCountry();
 
+
+    /**
+     * Return a code for a rejected transaction that describes the possible reason for a transaction being refused (Optional parameter)
+     *
+     * @return string
+     */
+    public function getSellerCode();
+
+
+    /**
+     * Return a control param from Dotpay notification
+     *
+     * @return string
+     */
+    public function getControlNot();
+
     /**
      * Return a checksum of a Dotpay notification.
      *

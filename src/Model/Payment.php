@@ -250,6 +250,7 @@ class Payment
         return $this;
     }
 
+
     /**
      * Set a Seller model for the payment.
      *
