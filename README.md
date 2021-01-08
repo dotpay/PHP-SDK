@@ -1,6 +1,11 @@
 # Dotpay PHP SDK
 
-**To jest integralna część wtyczki dla [magento 2](https://github.com/wpawel/magento2-payment)**
+**To jest integralna część wtyczki przygotowanej dla [magento 2](https://github.com/wpawel/magento2-payment)**
+
+
+[![](https://img.shields.io/github/release/wpawel/PHP-SDK.svg?style=for-the-badge)](https://github.com/wpawel/PHP-SDK/releases/latest "Download")
+
+
 
 You can implement payment gateway via dotpay in easy way.
 
