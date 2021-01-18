@@ -180,6 +180,13 @@ interface ConfigurationProviderInterface
     public function getInstructionVisible();
 
     /**
+     * Check if Control field with additional information (default)
+     *
+     * @return bool
+     */
+    public function getControlDefault();
+
+    /**
      * Check if refunds requesting is enabled from a shop system.
      *
      * @return bool
@@ -227,7 +234,17 @@ interface ConfigurationProviderInterface
      * @return string
      */
     public function getShopName();
+    
+    public function getStoreName();
 
+    /**
+     * Return a email of shop which is sent to Dotpay server.
+     *
+     * @return string
+     */
+    public function getShopEmail();
+
+    public function getStoreEmail();
     /**
      * Return a flag if multimerchant is enabled.
      *

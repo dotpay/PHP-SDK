@@ -69,6 +69,11 @@ class Notification
     private $ipCountry = '';
 
     /**
+     * @var string code for a rejected transaction that describes the possible reason for a transaction being refused (Optional parameter)
+     */
+    private $sellerCode = '';
+
+    /**
      * @var CreditCard|null CreditCard object if payment was realize by credit card and this information is allowed to send
      */
     private $creditCard = null;
@@ -77,6 +82,10 @@ class Notification
      * @var string Checksum of a Dotpay notification
      */
     private $signature = '';
+
+
+    private $controlNot = '';
+
 
     /**
      * Create the model based on data provided from shop.
@@ -102,6 +111,12 @@ class Notification
         }
         if ($provider->getIpCountry() !== null) {
             $notification->setIpCountry($provider->getIpCountry());
+        }
+        if ($provider->getSellerCode() !== null) {
+            $notification->setSellerCode($provider->getSellerCode());
+        }
+        if ($provider->getControlNot() !== null) {
+            $notification->setControlNot($provider->getControlNot());
         }
         if ($provider->getCreditCard() !== null) {
             $notification->setCreditCard($provider->getCreditCard());
@@ -176,6 +191,17 @@ class Notification
     }
 
     /**
+     * Return a contrtol param from Dotpay notification
+     *
+     * @return string
+     */
+    public function getControlNot()
+    {
+        return $this->controlNot;
+    }
+
+
+    /**
      * Return a codename of a country resulting from IP address from which the payment was made.
      *
      * @return string
@@ -184,6 +210,18 @@ class Notification
     {
         return $this->ipCountry;
     }
+
+
+    /**
+     * Return a code for a rejected transaction that describes the possible reason for a transaction being refused (Optional parameter).
+     *
+     * @return string
+     */
+    public function getSellerCode()
+    {
+        return $this->sellerCode;
+    }
+
 
     /**
      * Return a CreditCard object if payment was realize by credit card and this information is allowed to send.
@@ -209,11 +247,11 @@ class Notification
      * Calculate a signature based on data from the notification and the given seller pin.
      *
      * @param string $pin Seller pin
-     *
+     * param $diag != null ONLY USE TO DEBUG the problem with the displayed response to urlc notification: 'ERROR SIGNATURE - CHECK PIN' !
      * @return string
      */
 
-    public function calculateSignature($pin)
+    public function calculateSignature($pin,$diag=null)
     {
         $sign =
             $pin.
@@ -230,11 +268,12 @@ class Notification
             $this->getOperation()->getOriginalCurrency().
             $this->getOperation()->getDateTime()->format('Y-m-d H:i:s').
             $this->getOperation()->getRelatedNumber().
-            $this->getOperation()->getControl().
+            $this->getControlNot().
             $this->getOperation()->getDescription().
             $this->getOperation()->getPayer()->getEmail().
             $this->getShopName().
             $this->getShopEmail();
+            
         if ($this->getCreditCard() !== null) {
             $sign .=
                 $this->getCreditCard()->getIssuerId().
@@ -249,9 +288,15 @@ class Notification
         $sign .=
             $this->getChannelId().
             $this->getChannelCountry().
-            $this->getIpCountry();
-
+            $this->getIpCountry().
+            $this->getSellerCode();
+      
+       if($diag == null ){
         return hash('sha256', $sign);
+       }   else {
+        return base64_encode($sign);
+       }  
+       
     }
 
     /**
@@ -335,6 +380,21 @@ class Notification
     }
 
     /**
+     * Set a control from Dotpay notification.
+     *
+     * @param string $controlNot 
+     *
+     * @return Notification
+     */
+    public function setControlNot($ControlNot)
+    {
+        $this->controlNot = $ControlNot;
+
+        return $this;
+    }
+
+
+    /**
      * Set a codename of a country resulting from IP address from which the payment was made.
      *
      * @param string $ipCountry Codename of a country resulting from IP address from which the payment was made
@@ -344,6 +404,20 @@ class Notification
     public function setIpCountry($ipCountry)
     {
         $this->ipCountry = $ipCountry;
+
+        return $this;
+    }
+
+    /**
+     * Set a code for a rejected transaction that describes the possible reason for a transaction being refused
+     * 
+     * @param string $sellerCode code for a rejected transaction that describes the possible reason for a transaction being refused
+     *
+     * @return Notification
+     */
+    public function setSellerCode($sellerCode)
+    {
+        $this->sellerCode = $sellerCode;
 
         return $this;
     }

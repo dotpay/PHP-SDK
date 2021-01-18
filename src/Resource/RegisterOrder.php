@@ -40,6 +40,7 @@ use Dotpay\Resource\RegisterOrder\Result;
 use Dotpay\Exception\Resource\PaymentNotCreatedException;
 use Dotpay\Exception\Resource\InstructionNotFoundException;
 
+
 /**
  * Provide an interface to use Register Method to create payments.
  */
@@ -54,6 +55,8 @@ class RegisterOrder extends Resource
      * @var Loader Instance of SDK Loader
      */
     private $loader;
+
+    protected $MagentoUrl;
 
     /**
      * Initialize the resource.
@@ -168,6 +171,66 @@ class RegisterOrder extends Resource
         return (string) $parts[count($parts) - 2];
     }
 
+
+    /**
+     * Return the name of the sales domain
+     * 
+     * @return string
+     */
+    public function getHost($url) { 
+        $parseUrl = parse_url(trim($url)); 
+        if(isset($parseUrl['host']))
+        {
+            $host = $parseUrl['host'];
+        }
+        else
+        {
+             $path = explode('/', $parseUrl['path']);
+             $host = $path[0];
+        }
+        return trim($host); 
+     }
+
+     /**
+     * parsing the description to get the correct order number, 
+     * then encoding the data to send them in the DpOrderId parameter - return address to the store: URL
+     */
+    public function getOrderIdtoUrl($desription,$control){
+           
+        preg_match("/[\d\/\d]+/", $desription, $matches_nr);
+        
+        
+        if(isset($matches_nr[0])) {
+            $matches2_nr = explode('/', $matches_nr[0]);
+            
+            if(isset($matches2_nr[0])) {
+                $order_id = $matches2_nr[0];
+            }else{
+               $order_id  = null;
+            } 
+            if(isset($matches2_nr[1])) {
+                $control_id = $matches2_nr[1];
+            }else{
+               $control_id  = $control ;
+            }
+
+        }else {
+             $control_id  = $control;
+             $order_id  = null;
+        }
+
+        // encode data to base64
+        $idcontrol1 = base64_encode('#'.$control_id.'#'.$order_id.'#'.time()); 
+        
+        // simple trick to obstruct direct decoding this string from url:
+        $idcontrol1  = str_replace('=','',$idcontrol1); 
+        $rand = sha1(rand());
+        $idcontrol2 = substr($idcontrol1, 0, 8).substr($rand, 13, 6).substr($idcontrol1, 8, strlen($idcontrol1));
+        $idcontrol = "Ma:".substr($rand, 4, 3).$idcontrol2.substr(sha1(rand()), 10, 4).":RO";
+
+        return $idcontrol;
+
+}
     /**
      * Return a data structure for Register Order method.
      *
@@ -177,16 +240,26 @@ class RegisterOrder extends Resource
      */
     private function getDataStructure(Channel $channel)
     {
+        
+      $idcontrol_nr = $this->getOrderIdtoUrl($channel->getTransaction()->getPayment()->getDescription(),$channel->getTransaction()->getPayment()->getId());
+      
+      $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+      $storeManager = $objectManager->get('\Magento\Store\Model\StoreManagerInterface');
+      $MagentoUrl =  $this->getHost($storeManager->getStore()->getBaseUrl());
+      
+      $newControl = 'tr_id:#'.$channel->getTransaction()->getPayment()->getId().'|domain:'.$MagentoUrl.'|Magento DP module: v'.\Dotpay\Channel\Channel::DOTPAY_PLUGIN_VERSION.'|RO';
+
         $resultRO = [
             'order' => [
                 'amount' => $channel->getTransaction()->getPayment()->getAmount(),
                 'currency' => $channel->getTransaction()->getPayment()->getCurrency(),
                 'description' => $channel->getTransaction()->getPayment()->getDescription(),
-                'control' => $channel->getTransaction()->getPayment()->getId()
+                //'control' => $channel->getTransaction()->getPayment()->getId()
+                'control' => $newControl
             ],
             'seller' => [
                 'account_id' => $channel->getTransaction()->getPayment()->getSeller()->getId(),
-                'url' => $channel->getTransaction()->getBackUrl(),
+                'url' => $channel->getTransaction()->getBackUrl().'?DpOrderId='.$idcontrol_nr,
                 'urlc' => $channel->getTransaction()->getConfirmUrl()
             ],
             'payer' => [

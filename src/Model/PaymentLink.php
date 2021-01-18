@@ -96,6 +96,12 @@ class PaymentLink
     private $control = null;
 
     /**
+     * @var additional parameter from order id to URL parameter
+     */
+    private $orderIDforURL = null;
+
+
+    /**
      * @var string A description of the operation
      */
     private $description = '';
@@ -122,7 +128,8 @@ class PaymentLink
             ->setType($provider->getType())
             ->setCurrency($provider->getCurrency())
             ->setDescription($provider->getDescription())
-            ->setControl($provider->getControl())
+            ->setOrderIDforURL($provider->getOrderIDforURL())
+            ->setControl($provider->getControl('full'))
             ->setPayer(Customer::createFromData($provider->getPayer()));
 
 
@@ -254,6 +261,27 @@ class PaymentLink
         $this->ignoreLastPaymentChannel = $ignoreLastPaymentChannel;
         return $this;
     }
+
+
+        /**
+     * @return string
+     */
+    public function getOrderIDforURL()
+    {
+        return $this->orderIDforURL;
+    }
+
+    /**
+     * @param string $orderIDforURL
+     * @return PaymentLink
+     */
+    public function setOrderIDforURL($orderIDforURL)
+    {
+        $this->orderIDforURL = $orderIDforURL;
+        return $this;
+    }
+
+
 
     /**
      * @return string

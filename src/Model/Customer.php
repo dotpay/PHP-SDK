@@ -186,6 +186,7 @@ class Customer extends Payer
         return $this->city;
     }
 
+    
     /**
      * Return a country of the customer.
      *
@@ -242,10 +243,17 @@ class Customer extends Payer
     public function setStreet($street)
     {
         $street = $this->extractStreet($street);
-        if (!Street::validate($street)) {
-            throw new StreetException($street);
+
+        $Newstreet = trim(preg_replace('/[^\p{L}0-9\.\s\-\'_,]/u','',$street));
+        if(strlen($Newstreet) > 100) {
+            $Newstreet = substr($Newstreet,0,96)." _";
+        }  
+
+
+        if (!Street::validate($Newstreet)) {
+            throw new StreetException($Newstreet);
         }
-        $this->street = (string) $street;
+        $this->street = (string) $Newstreet;
 
         return $this;
     }
@@ -263,10 +271,16 @@ class Customer extends Payer
     {
         $buildingNumber = $this->extractBnFromStreet($buildingNumber, $street);
 
-        if (!BNumber::validate($buildingNumber)) {
-            throw new BNumberException($buildingNumber);
+        $NewbuildingNumber = trim(preg_replace('/[^\p{L}0-9\s\-_\/]/u','',$buildingNumber));
+        if(strlen($NewbuildingNumber) > 30){
+            $NewbuildingNumber = substr($NewbuildingNumber,0,27)." _";
+        }    
+
+
+        if (!BNumber::validate($NewbuildingNumber)) {
+            throw new BNumberException($NewbuildingNumber);
         }
-        $this->buildingNumber = (string) $buildingNumber;
+        $this->buildingNumber = (string) $NewbuildingNumber;
 
         return $this;
     }
@@ -282,10 +296,15 @@ class Customer extends Payer
      */
     public function setPostCode($postCode)
     {
-        if (!PostCode::validate($postCode)) {
+        $NewpostCode =trim(preg_replace('/[^\d\w\s\-]/u','',$postCode));
+        if(strlen($NewpostCode) > 20) {
+            $NewpostCode = substr($NewpostCode,0,17)." _";
+        } 
+
+        if (!PostCode::validate($NewpostCode)) {
             throw new PostCodeException($postCode);
         }
-        $this->postCode = (string) $postCode;
+        $this->postCode = (string) $NewpostCode;
 
         return $this;
     }
@@ -301,10 +320,16 @@ class Customer extends Payer
      */
     public function setCity($city)
     {
-        if (!Name::validate($city)) {
-            throw new CityException($city);
+
+        $Newcity =trim(preg_replace('/[^\p{L}0-9\.\s\-\'_,]/u','',$city));
+        if(strlen($Newcity) > 50) {
+            $Newcity = substr($Newcity,0,47)." _";
+        } 
+
+        if (!Name::validate($Newcity)) {
+            throw new CityException($Newcity);
         }
-        $this->city = (string) $city;
+        $this->city = (string) $Newcity;
 
         return $this;
     }
@@ -340,11 +365,16 @@ class Customer extends Payer
      */
     public function setPhone($phone)
     {
-        if (!Phone::validate($phone)) {
+        $NewPhone = preg_replace('/[^\+\s0-9\-_]/u','',$phone);
+        if(strlen($NewPhone) > 20){
+            $NewPhone = substr($NewPhone,0,17)." _";
+        }    
+
+        if (!Phone::validate($NewPhone)) {
            // throw new PhoneException($phone);
-           $this->phone = null;
+           $this->phone = null; //null
         }else{
-            $this->phone = (string) $phone;
+            $this->phone = (string) $NewPhone;
         }
         
         return $this;
@@ -414,7 +444,9 @@ class Customer extends Payer
     private function extractStreet($street)
     {
         $buildingNumber = $this->buildingNumber;
-        if (empty($buildingNumber) && !empty($street)) {
+
+        if (empty($buildingNumber) && !empty($street)) 
+        {
 
             preg_match("/\s[\p{L}0-9\s\-_\/]{1,15}$/u", $street, $matches);
 
@@ -428,9 +460,14 @@ class Customer extends Payer
             } else {
                 $street = trim(preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street));
             }
+
+
         } else {
+
             $street = trim(preg_replace('/[^\p{L}0-9\.\s\-\/_,]/u','',$street));
         }
+
+
         $this->buildingNumber = $buildingNumber;
         return $street;
     }

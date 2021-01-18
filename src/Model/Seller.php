@@ -169,13 +169,15 @@ class Seller
     }
 
     /**
-     * Return an info about a shop name.
+     * Return an info/email about a shop name.
      *
      * @return string
      */
     public function getInfo()
     {
+
         return $this->info;
+      
     }
 
     /**
@@ -292,7 +294,9 @@ class Seller
      */
     public function setInfo($info)
     {
-        $this->info = $info;
+
+       $this->info = $info;
+
 
         return $this;
     }

@@ -66,6 +66,10 @@ abstract class Resource
     {
         $this->config = $config;
         $this->curl = $curl;
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+		$productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface'); 
+		$this->MagentoVersion = $productMetadata->getVersion();
     }
 
     /**
@@ -108,7 +112,7 @@ abstract class Resource
         $headers = [
             $this->getAcceptHeader(),
             'Content-Type: application/json; charset=utf-8',
-            'User-Agent: DotpaySDK',
+            'User-Agent: DotpaySDK/Magento v'.$this->MagentoVersion.'/ID: '.$this->config->getId(),
         ];
         $this->curl->addOption(CURLOPT_HTTPHEADER, $headers);
         $this->curl->addOption(CURLOPT_RETURNTRANSFER, 1);

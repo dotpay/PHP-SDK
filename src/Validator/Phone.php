@@ -41,6 +41,6 @@ class Phone implements IValidate
      */
     public static function validate($value)
     {
-        return (bool) preg_match('/^\+?[\s0-9\/\-]{8,}$/', $value);
+        return (bool) preg_match('/^[\+\s0-9\-_]{3,20}$/', $value);
     }
 }

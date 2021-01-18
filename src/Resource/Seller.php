@@ -55,7 +55,8 @@ class Seller extends Resource
     /**
      * @var Loader Instance of SDK Loader
      */
-    private $loader;
+    private $loader;  
+    
     /**
      * Initialize the resource.
      *
@@ -89,6 +90,18 @@ class Seller extends Resource
     }
 
     /**
+     *  Check if Control field with additional information (default).
+     *
+     * @return bool
+     */
+    public function checkControlType()
+    {
+        return $this->config->getControlDefault();
+    }
+
+
+    
+    /**
      * Check if the given normal seller pin is correct.
      *
      * @return bool
@@ -97,6 +110,7 @@ class Seller extends Resource
     {
         return $this->checkIdAndPin($this->config->getId(), $this->config->getPin());
     }
+
 
     /**
      * Check if the given seller pin for foreign currencies is correct.
@@ -171,7 +185,7 @@ class Seller extends Resource
     public function getOperationById($id)
     {
         try {
-            foreach ($this->getPaginateDataFromApi('operations/?control='.$id.'&format=json') as $operation) {
+            foreach ($this->getPaginateDataFromApi('operations/?description=/'.$id.'&format=json') as $operation) {
                 if ($operation['control'] === $id) {
                     return $this->getWrapedOperation($operation);
                 }
@@ -298,15 +312,20 @@ class Seller extends Resource
      */
     private function getDataForNewPaymentLink(PaymentLink $paymentLink)
     {
+
+        $idcontrol = $paymentLink->getOrderIDforURL();
+        $control = $paymentLink->getControl('full');
+
+
         $data = [
             'amount' => $paymentLink->getAmount(),
             'currency' => $paymentLink->getCurrency(),
             'description' => $paymentLink->getDescription(),
-            'control' => $paymentLink->getControl(),
+            'control' => $control,
             'language' => $paymentLink->getLanguage(),
             'ignore_last_payment_channel' => $paymentLink->getIgnoreLastPaymentChannel(),
             'redirection_type' => $paymentLink->getType(),
-            'url' => $paymentLink->getUrl(),
+            'url' => $paymentLink->getUrl().'?DpOrderId='.$idcontrol,
             'urlc' => $paymentLink->getUrlc(),
             'payer' => [
                 'first_name' => $paymentLink->getPayer()->getFirstName(),
@@ -316,6 +335,22 @@ class Seller extends Resource
             ]
 
         ];
+
+        $sellerInfo = $this->config->getShopName();
+        $sellerEmail = $this->config->getShopEmail();
+
+        if (!empty($sellerInfo)) {
+                $data['seller'] = [
+                        'p_info' => $sellerInfo
+                ]; 
+        }
+
+        if (!empty($sellerEmail)) {
+                $data['seller'] = [
+                        'p_email' => $sellerEmail
+                ]; 
+        }
+
         if($paymentLink->getPayer()->isAddressAvailable())
         {
             $data['payer']['address'] = [

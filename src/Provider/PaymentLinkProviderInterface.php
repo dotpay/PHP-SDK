@@ -62,6 +62,15 @@ interface PaymentLinkProviderInterface
      */
     public function getControl();
 
+
+    /**
+     * Return order id's for url
+     *
+     * @return mixed
+     */
+    public function getOrderIDforURL();
+
+
     /**
      * Return a description of the operation.
      *

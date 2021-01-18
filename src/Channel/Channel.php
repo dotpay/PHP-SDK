@@ -33,6 +33,7 @@ use Dotpay\Resource\Payment as PaymentResource;
 use Dotpay\Resource\Seller as SellerResource;
 use Dotpay\Model\Seller as SellerModel;
 use Dotpay\Model\Payment;
+use Dotpay\Model\PaymentLink;
 use Dotpay\Model\Transaction;
 use Dotpay\Model\Configuration;
 use Dotpay\Exception\Channel\SellerNotGivenException;
@@ -44,6 +45,7 @@ use Dotpay\Html\Form\Input;
 use Dotpay\Html\Container\Script;
 use Dotpay\Html\PlainText;
 use Dotpay\Html\Container\Form;
+
 
 
 /**
@@ -64,7 +66,7 @@ class Channel
     /**
      * Last version number of the plugin
      */
-    const DOTPAY_PLUGIN_VERSION = '1.0.17';
+    const DOTPAY_PLUGIN_VERSION = '1.0.18';
 
     /**
      * @var int Code number of payment channel in Dotpay system
@@ -123,6 +125,11 @@ class Channel
     protected $seller = null;
 
     /**
+     * @var \Magento\Checkout\Model\Session Session of checkout
+     */
+    protected $_checkoutSession;
+
+    /**
      * Initialize a separate channel.
      *
      * @param int             $channelId       Code number of payment channel in Dotpay system
@@ -130,9 +137,17 @@ class Channel
      * @param Configuration   $config          Dotpay configuration object
      * @param Transaction     $transaction     Object with transaction details
      * @param PaymentResource $paymentResource Payment resource which can be used for Payment API
+     * @param \Magento\Checkout\Model\Session                  $checkoutSession
      * @param SellerResource  $sellerResource  Seller resource which can be used for Seller API
      */
-    public function __construct($channelId, $code, Configuration $config, Transaction $transaction, PaymentResource $paymentResource, SellerResource $sellerResource)
+    public function __construct(
+        $channelId, 
+        $code, 
+        Configuration $config, 
+        Transaction $transaction, 
+        PaymentResource $paymentResource, 
+        SellerResource $sellerResource
+       )
     {
         $this->code = $code;
         $this->config = $config;
@@ -328,6 +343,66 @@ class Channel
     }
 
     /**
+     * Parsing domain from a URL
+     */
+    public function getHost($url) { 
+        $parseUrl = parse_url(trim($url)); 
+        if(isset($parseUrl['host']))
+        {
+            $host = $parseUrl['host'];
+        }
+        else
+        {
+             $path = explode('/', $parseUrl['path']);
+             $host = $path[0];
+        }
+        return trim($host); 
+     }
+
+
+    /**
+     * parsing the description to get the correct order number, 
+     * then encoding the data to send them in the DpOrderId parameter - return address to the store: URL
+     */
+    public function getOrderIdtoUrl($desription,$control){
+           
+        preg_match("/[\d\/\d]+/", $desription, $matches_nr);
+        
+        
+        if(isset($matches_nr[0])) {
+            $matches2_nr = explode('/', $matches_nr[0]);
+            
+            if(isset($matches2_nr[0])) {
+                $order_id = $matches2_nr[0];
+            }else{
+               $order_id  = null;
+            } 
+            if(isset($matches2_nr[1])) {
+                $control_id = $matches2_nr[1];
+            }else{
+               $control_id  = $control ;
+            }
+
+        }else {
+             $control_id  = $control;
+             $order_id  = null;
+        }
+
+        // encode data to base64
+        $idcontrol1 = base64_encode('#'.$control_id.'#'.$order_id.'#'.time()); 
+        
+        // simple trick to obstruct direct decoding this string from url:
+        $idcontrol1  = str_replace('=','',$idcontrol1); 
+        $rand = sha1(rand());
+        $idcontrol2 = substr($idcontrol1, 0, 8).substr($rand, 13, 6).substr($idcontrol1, 8, strlen($idcontrol1));
+        $idcontrol = "Ma:".substr($rand, 4, 3).$idcontrol2.substr(sha1(rand()), 10, 4).":IN";
+
+        return $idcontrol;
+
+}
+
+
+    /**
      * Return array of hidden fields for a form to redirecting to a Dotpay site with all needed information about a current payment.
      *
      * @return array
@@ -340,21 +415,25 @@ class Channel
             throw new SellerNotGivenException();
         }
         
+        $idcontrol_nr = $this->getOrderIdtoUrl($this->transaction->getPayment()->getDescription(),$this->transaction->getPayment()->getId());
 
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
-		$productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface'); 
-        $this->MagentoVersion = $productMetadata->getVersion();
-        
-        $newControl = 'tr_id:'.$this->transaction->getPayment()->getId().'|Magento: v'.$this->MagentoVersion.'|DP module: v'.self::DOTPAY_PLUGIN_VERSION;
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+            $storeManager = $objectManager->get('\Magento\Store\Model\StoreManagerInterface');
+            $this->MagentoUrl =  $this->getHost($storeManager->getStore()->getBaseUrl());
+
+        $newControl = 'tr_id:#'.$this->transaction->getPayment()->getId().'|domain:'.$this->MagentoUrl.'|Magento DP module: v'.self::DOTPAY_PLUGIN_VERSION;
         $data = [];
         $data['id'] = $this->seller->getId();
-        //$data['control'] = $newControl;
-        $data['control'] = $this->transaction->getPayment()->getId();
-        $sellerInfo = $this->transaction->getPayment()->getSeller()->getInfo();
+        if($this->config->getControlDefault()){
+            $data['control'] = $this->transaction->getPayment()->getId();
+        }else{
+            $data['control'] = $newControl;
+        }
+        $sellerInfo = $this->config->getShopName();
         if (!empty($sellerInfo)) {
             $data['p_info'] = $sellerInfo;
         }
-        $sellerEmail = $this->transaction->getPayment()->getSeller()->getEmail();
+        $sellerEmail = $this->config->getShopEmail();
         if (!empty($sellerEmail)) {
             $data['p_email'] = $sellerEmail;
         }
@@ -362,7 +441,7 @@ class Channel
         $data['currency'] = $this->transaction->getPayment()->getCurrency();
         $data['description'] = $this->transaction->getPayment()->getDescription();
         $data['lang'] = $this->transaction->getCustomer()->getLanguage();
-        $data['url'] = $this->transaction->getBackUrl();
+        $data['url'] = $this->transaction->getBackUrl().'?DpOrderId='.$idcontrol_nr;
         $data['urlc'] = $this->transaction->getConfirmUrl();
         $data['api_version'] = $this->config->getApi();
         $data['type'] = 4;
@@ -383,14 +462,13 @@ class Channel
         $data['channel'] = $this->getChannelId();
         $data['customer'] = (string) $this->transaction->getCustomerAdditionalData();
         $data['ignore_last_payment_channel'] = 1;
-
         
         return $data;
     }
 
     /**
      * Return an array with all hidden fields including CHK.
-     *
+     *  
      * @return array
      */
     public function getAllHiddenFields()
@@ -510,6 +588,7 @@ class Channel
      *
      * @return string
      */
+
     public static function getCHK($inputParameters, $pin, array $subPayments = [])
     {
         $CHkInputString =
@@ -598,7 +677,8 @@ class Channel
         }
 
         return hash('sha256', $CHkInputString);
-    }
+
+    }     
 
     /**
      * Set the seller model with the correct data from plugin Configuration.
