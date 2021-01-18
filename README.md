@@ -3,7 +3,7 @@
 **To jest integralna część wtyczki przygotowanej dla [magento 2](https://github.com/wpawel/magento2-payment)**
 
 
-[![](https://img.shields.io/github/release/wpawel/PHP-SDK.svg?style=for-the-badge)](https://github.com/wpawel/PHP-SDK/releases/latest "Download")
+[![](https://img.shields.io/github/release/dotpay/PHP-SDK.svg?style=for-the-badge)](https://github.com/dotpay/PHP-SDK/releases/latest "Download")
 
 
 
