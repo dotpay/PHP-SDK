@@ -65,7 +65,8 @@ class Customer extends Payer
         'uk',
         'sk',
         'lv',
-        'lt'
+        'lt',
+		'nl' //not official
     );
 
     /**

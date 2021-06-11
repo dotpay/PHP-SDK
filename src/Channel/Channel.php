@@ -66,7 +66,7 @@ class Channel
     /**
      * Last version number of the plugin
      */
-    const DOTPAY_PLUGIN_VERSION = '1.0.18';
+    const DOTPAY_PLUGIN_VERSION = '1.0.19-dev';
 
     /**
      * @var int Code number of payment channel in Dotpay system

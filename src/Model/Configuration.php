@@ -49,7 +49,7 @@ class Configuration
     /**
      * Version of the SDK.
      */
-    const SDK_VERSION = '1.0.18';
+    const SDK_VERSION = '1.0.19-dev';
 
     const DOTPAY_SSL_URL = 'https://ssl.dotpay.pl';
 

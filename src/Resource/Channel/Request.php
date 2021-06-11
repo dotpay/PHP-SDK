@@ -328,7 +328,8 @@ class Request
     public function setLanguage($language)
     {
         if (!Language::validate($language)) {
-            throw new LanguageException($language);
+           // throw new LanguageException($language);
+			$language = 'en';
         }
         $this->language = (string) $language;
 
