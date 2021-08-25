@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2018 Dotpay sp. z o.o. <tech@dotpay.pl>.
+ * Copyright (c) 2021 PayPro S.A. <tech@dotpay.pl>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  * SOFTWARE.
  *
  * @author    Dotpay Team <tech@dotpay.pl>
- * @copyright Dotpay sp. z o.o.
+ * @copyright PayPro S.A.
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 
@@ -48,17 +48,17 @@ class Instruction
     /**
      * Name of the recipient of payment.
      */
-    const RECIPIENT_NAME = 'Dotpay sp. z o.o.';
+    const RECIPIENT_NAME = 'PayPro S.A.';
 
     /**
      * Street of the recipient of payment.
      */
-    const RECIPIENT_STREET = 'Wielicka 28B';
+    const RECIPIENT_STREET = 'ul. Kanclerska 15';
 
     /**
      * Post code and city of the recipient of payment.
      */
-    const RECIPIENT_CITY = '30-552 Kraków';
+    const RECIPIENT_CITY = '60-327 Poznań';
 
     /**
      * @var int|null Id of the instruction in a shop

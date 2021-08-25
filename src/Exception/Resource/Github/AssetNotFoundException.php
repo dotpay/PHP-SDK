@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2018 Dotpay sp. z o.o. <techdotpay.pl>.
+ * Copyright (c) 2021 PayPro S.A. <techdotpay.pl>.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  * SOFTWARE.
  *
  * @author    Dotpay Team <tech@dotpay.pl>
- * @copyright Dotpay sp. z o.o.
+ * @copyright PayPro S.A.
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 
