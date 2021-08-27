@@ -58,5 +58,25 @@ abstract class IpDetector
 
 		}
 	
+
+    /**
+         * Returns if the given ip is on the given whitelist.
+         *
+         * @param string $ip        The ip to check.
+         * @param array  $whitelist The ip whitelist. An array of strings.
+         *
+         * @return bool
+     */
+    public static function isAllowedIp($ip, array $whitelist)
+    {
+        $ip = (string)$ip;
+        if (in_array($ip, $whitelist, true)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
 	
 }

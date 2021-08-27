@@ -66,7 +66,7 @@ class Channel
     /**
      * Last version number of the plugin
      */
-    const DOTPAY_PLUGIN_VERSION = '1.0.18';
+    const DOTPAY_PLUGIN_VERSION = '1.0.19';
 
     /**
      * @var int Code number of payment channel in Dotpay system
@@ -423,45 +423,61 @@ class Channel
 
         $newControl = 'tr_id:#'.$this->transaction->getPayment()->getId().'|domain:'.$this->MagentoUrl.'|Magento DP module: v'.self::DOTPAY_PLUGIN_VERSION;
         $data = [];
-        $data['id'] = $this->seller->getId();
+        $data['id'] = (string) $this->seller->getId();
         if($this->config->getControlDefault()){
-            $data['control'] = $this->transaction->getPayment()->getId();
+            $data['control'] = (string)$this->transaction->getPayment()->getId();
         }else{
-            $data['control'] = $newControl;
+            $data['control'] = (string)$newControl;
         }
         $sellerInfo = $this->config->getShopName();
         if (!empty($sellerInfo)) {
-            $data['p_info'] = $sellerInfo;
+            $data['p_info'] = (string) $sellerInfo;
         }
         $sellerEmail = $this->config->getShopEmail();
         if (!empty($sellerEmail)) {
             $data['p_email'] = $sellerEmail;
         }
-        $data['amount'] = $this->transaction->getPayment()->getAmount();
-        $data['currency'] = $this->transaction->getPayment()->getCurrency();
-        $data['description'] = $this->transaction->getPayment()->getDescription();
-        $data['lang'] = $this->transaction->getCustomer()->getLanguage();
+        $data['amount'] = (string)$this->transaction->getPayment()->getAmount();
+        $data['currency'] = (string)$this->transaction->getPayment()->getCurrency();
+        $data['description'] = (string)$this->transaction->getPayment()->getDescription();
+        $data['lang'] = (string)$this->transaction->getCustomer()->getLanguage();
         $data['url'] = $this->transaction->getBackUrl().'?DpOrderId='.$idcontrol_nr;
         $data['urlc'] = $this->transaction->getConfirmUrl();
         $data['api_version'] = $this->config->getApi();
-        $data['type'] = 4;
-        $data['ch_lock'] = 0;
-        $data['firstname'] = $this->transaction->getCustomer()->getFirstName();
-        $data['lastname'] = $this->transaction->getCustomer()->getLastName();
+        $data['type'] = '4';
+        $data['ch_lock'] = '0';
+        $data['firstname'] = (string)$this->transaction->getCustomer()->getFirstName();
+        $data['lastname'] = (string)$this->transaction->getCustomer()->getLastName();
         $data['email'] = $this->transaction->getCustomer()->getEmail();
+
         if($this->transaction->getCustomer()->isAddressAvailable()) {
-            $data['phone'] = $this->transaction->getCustomer()->getPhone();
-            $data['street'] = $this->transaction->getCustomer()->getStreet();
-            $data['street_n1'] = $this->transaction->getCustomer()->getBuildingNumber();
-            $data['city'] = $this->transaction->getCustomer()->getCity();
-            $data['postcode'] = $this->transaction->getCustomer()->getPostCode();
-            $data['country'] = $this->transaction->getCustomer()->getCountry();
+
+            if ( (string) $this->transaction->getCustomer()->getPhone() != "" ){
+                $data['phone'] = (string) $this->transaction->getCustomer()->getPhone();
+            }
+            
+            if ((string) $this->transaction->getCustomer()->getStreet() != "") {
+                $data['street'] = (string) $this->transaction->getCustomer()->getStreet();
+            }
+    
+            if ((string) $this->transaction->getCustomer()->getBuildingNumber() != "" ) {
+                $data['street_n1'] = (string) $this->transaction->getCustomer()->getBuildingNumber();
+            }
+            if ((string) $this->transaction->getCustomer()->getCity() != "") {
+                $data['city'] = (string) $this->transaction->getCustomer()->getCity();
+            }
+            if ((string) $this->transaction->getCustomer()->getPostCode() != ""){
+                $data['postcode'] = (string) $this->transaction->getCustomer()->getPostCode();
+            }
+            if ((string) $this->transaction->getCustomer()->getCountry() != ""){
+                $data['country'] = (string) $this->transaction->getCustomer()->getCountry();
+            }
         }
-        $data['bylaw'] = 1;
-        $data['personal_data'] = 1;
-        $data['channel'] = $this->getChannelId();
+        $data['bylaw'] = '1';
+        $data['personal_data'] = '1';
+        $data['channel'] = (string)$this->getChannelId();
         $data['customer'] = (string) $this->transaction->getCustomerAdditionalData();
-        $data['ignore_last_payment_channel'] = 1;
+       // $data['ignore_last_payment_channel'] = '1';
         
         return $data;
     }
@@ -474,7 +490,12 @@ class Channel
     public function getAllHiddenFields()
     {
         $data = $this->prepareHiddenFields();
-        $data['chk'] = self::getCHK($data, $this->seller->getPin(), $this->transaction->getSubPayments());
+        if($this->config->getApi() == 'next'){
+            $data['chk'] = self::generateCHK($data, $this->seller->getPin());
+        }else {
+            $data['chk'] = self::getCHK($data, $this->seller->getPin(), $this->transaction->getSubPayments());
+        }
+
 
         return $data;
     }
@@ -580,7 +601,7 @@ class Channel
     }
 
     /**
-     * Calculate CHK for the given data.
+     * Depreciated: calculate CHK for the given data. - only for 'api_version = dev'
      *
      * @param array  $inputParameters Array with transaction parameters
      * @param string $pin             Seller pin to sign the control sum
@@ -679,6 +700,44 @@ class Channel
         return hash('sha256', $CHkInputString);
 
     }     
+
+
+    /**
+     * CURRENT: calculate CHK for the given data. - only for 'api_version = next'
+     *
+     * @param array  $inputParameters Array with transaction parameters
+     * @param string $pin             Seller pin to sign the control sum
+     *
+     * @return string
+     */
+    
+    
+    ## function: counts the checksum from the defined array of all parameters
+
+protected function generateCHK($ParametersArray,$DotpayPin)
+{
+    
+        //sorting the parameter list
+        ksort($ParametersArray);
+        
+        // Display the semicolon separated list
+        $paramList = implode(';', array_keys($ParametersArray));
+        
+        //adding the parameter 'paramList' with sorted list of parameters to the array
+        $ParametersArray['paramsList'] = $paramList;
+        
+        //re-sorting the parameter list
+        ksort($ParametersArray);
+        
+        //json encoding  
+        $json = json_encode($ParametersArray, JSON_UNESCAPED_SLASHES);
+        
+     return hash_hmac('sha256', $json, $DotpayPin, false);
+   
+}
+
+
+
 
     /**
      * Set the seller model with the correct data from plugin Configuration.

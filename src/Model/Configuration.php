@@ -49,7 +49,7 @@ class Configuration
     /**
      * Version of the SDK.
      */
-    const SDK_VERSION = '1.0.18';
+    const SDK_VERSION = '1.0.19';
 
     const DOTPAY_SSL_URL = 'https://ssl.dotpay.pl';
 
@@ -74,9 +74,19 @@ class Configuration
     const SELLER_URL_DEV = 'https://ssl.dotpay.pl/test_seller/';
 
     /**
-     * Address IP of Dotpay confirmation server.
+     * Addresses IP of Dotpay confirmation server.
      */
-    const CALLBACK_IP = '195.150.9.37';
+    //const CALLBACK_IP = '195.150.9.37';
+
+    const DOTPAY_CALLBACK_IP_WHITE_LIST = array(
+                                                '195.150.9.37',
+                                                '91.216.191.181',
+                                                '91.216.191.182',
+                                                '91.216.191.183',
+                                                '91.216.191.184',
+                                                '91.216.191.185',
+                                                '5.252.202.255',
+                                                );
 
     /**
      * Address IP od Dotpay office.
@@ -188,6 +198,12 @@ class Configuration
      * @var bool Flag if test mode is activated
      */
     private $testMode = false;
+
+
+    /**
+     * @var boolean Flag if 'server does not use a proxy' mode is activated
+     */
+    private $nonproxyMode = true;
 
     /**
      * @var bool Flag if One Click card channel is visible
@@ -302,7 +318,9 @@ class Configuration
     /**
      * @var string Payment API version
      */
-    private $api = 'dev';
+    //private $api = 'dev'; // depreciated
+    private $api = 'next'; // current - new method for calculating the chk parameter
+
 
     /**
      * @var array Array of validation errors with provided data
@@ -328,6 +346,7 @@ class Configuration
             ->setUsername($provider->getUsername())
             ->setPassword($provider->getPassword())
             ->setTestMode($provider->getTestMode())
+            ->setNonProxyMode($provider->getNonProxyMode())
             ->setOcVisible($provider->getOcVisible())
             ->setFccVisible($provider->getFccVisible())
             ->setFccId($provider->getFccId())
@@ -456,6 +475,17 @@ class Configuration
     {
         return $this->testMode;
     }
+
+
+    /**
+     * Check if non proxy is enabled
+     * @return boolean
+     */
+    public function getNonProxyMode()
+    {
+        return $this->nonproxyMode;
+    }
+
 
     /**
      * Check if the One Click card channel is set as visible.
@@ -1027,6 +1057,19 @@ class Configuration
         return $this;
     }
 
+
+    /**
+     * Set the flag which informs if non proxy is enabled or not
+     * @param bool $NonProxyMode mode flag
+     * @return Configuration
+     */
+    public function setNonProxyMode($nonproxyMode)
+    {
+        $this->nonproxyMode = (bool)$nonproxyMode;
+        return $this;
+    }
+
+
     /**
      * Set the flag which informs if One Click card channel is visible.
      *
@@ -1406,15 +1449,15 @@ class Configuration
     /**
      * Set the given API version.
      *
-     * @param string $api Api version. Only "dev" is allowed
+     * @param string $api Api version. Only "dev" or "next" is allowed
      *
      * @return Configuration
      *
-     * @throws ApiVersionException Thrown when the given payment API version is different than the "dev" string
+     * @throws ApiVersionException Thrown when the given payment API version is different than the "dev" or "next" string
      */
     public function setApi($api)
     {
-        if ($api !== 'dev') {
+        if (($api != 'next') && ($api != 'dev')) {
             $this->addError(new ApiVersionException($api));
             return $this;
         }

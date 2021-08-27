@@ -90,10 +90,10 @@ class Other extends Channel
         $data = parent::prepareHiddenFields();
         $channelId = $this->getChannelId();
         if (empty($channelId) || !$this->config->getOtherChannelsVisible()) {
-            $data['type'] = 0;
-            $data['ch_lock'] = 0;
+            $data['type'] = '0';
+            $data['ch_lock'] = '0';
         } else {
-            $data['channel'] = $channelId;
+            $data['channel'] = (string) $channelId;
         }
 
         return $data;

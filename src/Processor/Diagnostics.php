@@ -95,8 +95,17 @@ class Diagnostics
     public function execute()
     {
         $config = $this->config;
-        if ((IpDetector::detect($this->config) == $config::OFFICE_IP ||  $_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP) && $_SERVER['REQUEST_METHOD'] == 'GET')
-         {
+       // if ((IpDetector::detect($this->config) == $config::OFFICE_IP ||  $_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP) && $_SERVER['REQUEST_METHOD'] == 'GET')
+         
+        if (
+            (
+                ( ((int)$config->getNonProxyMode() == 1) && ($_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP) ) || 
+                ( ((int)$config->getNonProxyMode() != 1) && (IpDetector::detect($this->config) == $config::OFFICE_IP))
+
+             ) && $_SERVER['REQUEST_METHOD'] == 'GET'
+           ) 
+        
+        {
             $this->completeInformations();
 
             die($this->outputMessage);
@@ -132,11 +141,12 @@ class Diagnostics
         }
         $this->addOutputMessage('Enabled: '.(int) $config->getEnable(), true)
             ->addOutputMessage('--- Dotpay PLN ---')
-            ->addOutputMessage('Id: '.$config->getId())
+            ->addOutputMessage('&#127380; Id: '.$config->getId())
             ->addOutputMessage('Correct Id: '.(int) $this->paymentApi->checkSeller($config->getId()))
             ->addOutputMessage('Correct Pin: '.(int) $this->sellerApi->checkPin())
             ->addOutputMessage('API Version: '.$config->getApi())
             ->addOutputMessage('Test Mode: '.(int) $config->getTestMode())
+            ->addOutputMessage('Not uses Proxy Mode: '.(int) $config->getNonProxyMode())
             ->addOutputMessage('Refunds: '.(int) $config->getRefundsEnable())
             ->addOutputMessage('Widget: '.(int) $config->getWidgetVisible())
             ->addOutputMessage('Widget currencies: '.$config->getWidgetCurrencies())
@@ -156,6 +166,8 @@ class Diagnostics
             ->addOutputMessage('FCC Correct Id: '.(int) $this->paymentApi->checkSeller($config->getFccId()))
             ->addOutputMessage('FCC Correct Pin: '.(int) $this->sellerApi->checkFccPin())
             ->addOutputMessage('FCC Currencies: '.$config->getFccCurrencies(), true)
+            ->addOutputMessage('--- REMOTE_ADDRESS ---')
+            ->addOutputMessage('$_SERVER[\'REMOTE_ADDR\'] : '.$_SERVER['REMOTE_ADDR'])
             ->addOutputMessage('--- Dotpay API ---')
             ->addOutputMessage('Data: '.(($config->isGoodApiData()) ? '&lt;given&gt;' : '&lt;empty&gt;'))
             ->addOutputMessage('Login: '.$config->getUsername());
@@ -196,7 +208,18 @@ class Diagnostics
     {
         $config = $this->config;
         if (
-            !(IpDetector::detect($this->config) == $config::CALLBACK_IP || IpDetector::detect($this->config) == $config::OFFICE_IP)
+            /*
+            !(
+                (IpDetector::isAllowedIp(IpDetector::detect($this->config), $config::DOTPAY_CALLBACK_IP_WHITE_LIST)) || 
+               IpDetector::detect($this->config) == $config::OFFICE_IP
+            )
+            */    
+            !(
+                (((int)$config->getNonProxyMode() == 1) && (IpDetector::isAllowedIp($_SERVER['REMOTE_ADDR'], $config::DOTPAY_CALLBACK_IP_WHITE_LIST))) || 
+                ( ( (int)$config->getNonProxyMode() != 1) && (IpDetector::isAllowedIp($clientIp, $config::DOTPAY_CALLBACK_IP_WHITE_LIST)))
+
+             )
+
            ) 
         {
             throw new ConfirmationDataException('ERROR (REMOTE ADDRESS: '.IpDetector::detect($this->config).')');

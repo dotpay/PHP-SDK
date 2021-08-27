@@ -191,11 +191,11 @@ class Oc extends Channel
     protected function prepareHiddenFields()
     {
         $data = parent::prepareHiddenFields();
-        $data['credit_card_customer_id'] = $this->getCard()->getCustomerHash();
+        $data['credit_card_customer_id'] = (string) $this->getCard()->getCustomerHash();
         if ($this->getCard()->getCardId() == null) {
-            $data['credit_card_store'] = 1;
+            $data['credit_card_store'] = "1";
         } else {
-            $data['credit_card_id'] = $this->getCard()->getCardId();
+            $data['credit_card_id'] = (string) $this->getCard()->getCardId();
         }
 
         return $data;

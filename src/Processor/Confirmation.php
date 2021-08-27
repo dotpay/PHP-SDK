@@ -174,6 +174,8 @@ class Confirmation
         }
     }
 
+
+
     /**
      * Check if the IP address of a notification is correct.
      *
@@ -184,8 +186,15 @@ class Confirmation
     protected function checkIp()
     {
         $config = $this->config;
-        if (
-            !(IpDetector::detect($this->config) == $config::CALLBACK_IP || $_SERVER['REMOTE_ADDR'] == $config::CALLBACK_IP || IpDetector::detect($this->config) == $config::OFFICE_IP || $_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP )
+        if (    
+   
+                 !(
+                    (((int)$config->getNonProxyMode() == 1) && (IpDetector::isAllowedIp($_SERVER['REMOTE_ADDR'], $config::DOTPAY_CALLBACK_IP_WHITE_LIST))) || 
+                    ( ( (int)$config->getNonProxyMode() != 1) && (IpDetector::isAllowedIp(IpDetector::detect($this->config), $config::DOTPAY_CALLBACK_IP_WHITE_LIST)))
+    
+                 )   
+
+
            ) 
             {
                 throw new ConfirmationDataException('ERROR (REMOTE ADDRESS: '.IpDetector::detect($this->config).'/'.$_SERVER['REMOTE_ADDR'].')');

@@ -514,6 +514,6 @@ class Seller extends Resource
      */
     private function getApiUrl($end)
     {
-        return $this->config->getSellerUrl().'api/'.$end;
+        return $this->config->getSellerUrl().'api/v1/'.$end;
     }
 }

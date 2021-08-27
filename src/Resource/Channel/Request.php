@@ -223,8 +223,14 @@ class Request
      */
     public function getQueryString()
     {
+        if($this->getAmount() != '' && $this->getAmount() > 0 ){
+            $amount = $this->getAmount();
+        }else{
+            $amount = '8.88'; // sample value, not null
+        }
+
         return 'id='.$this->getSellerId().
-               '&amount='.$this->getAmount().
+               '&amount='.$amount. //fix for empty request to the dotpay api
                '&currency='.$this->getCurrency().
                '&lang='.$this->getLanguage().
                '&format='.$this->getFormat();
@@ -240,7 +246,7 @@ class Request
         $config = new Configuration('');
         $config->setTestMode($this->isTestMode());
 
-        return $config->getPaymentUrl().'payment_api/channels/?'.$this->getQueryString();
+        return $config->getPaymentUrl().'payment_api/v1/channels/?'.$this->getQueryString();
     }
 
     /**
@@ -328,7 +334,8 @@ class Request
     public function setLanguage($language)
     {
         if (!Language::validate($language)) {
-            throw new LanguageException($language);
+           // throw new LanguageException($language);
+			$language = 'en';
         }
         $this->language = (string) $language;
 

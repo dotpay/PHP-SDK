@@ -65,7 +65,8 @@ class Customer extends Payer
         'uk',
         'sk',
         'lv',
-        'lt'
+        'lt',
+		'nl' //not official
     );
 
     /**
@@ -251,7 +252,8 @@ class Customer extends Payer
 
 
         if (!Street::validate($Newstreet)) {
-            throw new StreetException($Newstreet);
+           // throw new StreetException($Newstreet);
+            $Newstreet = null;
         }
         $this->street = (string) $Newstreet;
 
@@ -278,7 +280,8 @@ class Customer extends Payer
 
 
         if (!BNumber::validate($NewbuildingNumber)) {
-            throw new BNumberException($NewbuildingNumber);
+           // throw new BNumberException($NewbuildingNumber);
+            $NewbuildingNumber = "0";
         }
         $this->buildingNumber = (string) $NewbuildingNumber;
 
@@ -302,7 +305,8 @@ class Customer extends Payer
         } 
 
         if (!PostCode::validate($NewpostCode)) {
-            throw new PostCodeException($postCode);
+            //throw new PostCodeException($postCode);
+            $NewpostCode = null;
         }
         $this->postCode = (string) $NewpostCode;
 
@@ -327,7 +331,8 @@ class Customer extends Payer
         } 
 
         if (!Name::validate($Newcity)) {
-            throw new CityException($Newcity);
+            //throw new CityException($Newcity);
+            $Newcity = null;
         }
         $this->city = (string) $Newcity;
 
@@ -347,7 +352,7 @@ class Customer extends Payer
     {
         if (!Name::validate($country)) {
             //throw new CountryException($country);
-            $country = '';
+            $country = null;
         }
         $this->country = (string) $country;
 

@@ -151,10 +151,10 @@ class Dotpay extends Channel
         $data = parent::prepareHiddenFields();
         $channelId = $this->getChannelId();
         if (empty($channelId) || !$this->config->getWidgetVisible()) {
-            $data['type'] = 0;
-            $data['ch_lock'] = 0;
+            $data['type'] = '0';
+            $data['ch_lock'] = '0';
         } else {
-            $data['channel'] = $channelId;
+            $data['channel'] = (string) $channelId;
         }
 
         return $data;
@@ -170,16 +170,37 @@ class Dotpay extends Channel
     public function getScript(array $disableChanels = [])
     {
         $config = $this->config;
+
+		$amount1 = $this->transaction->getPayment()->getAmount();
+		
+		if($amount1 != '' && $amount1 > 0 ){
+			
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $cart = $objectManager->get('\Magento\Checkout\Model\Cart'); 
+
+            $grandTotal = $cart->getQuote()->getGrandTotal();
+
+			if($grandTotal && $grandTotal > 0 && $grandTotal > $amount1) {
+				$amount = $grandTotal;
+			}else{
+				$amount = $amount1;
+			}
+			
+		}else{
+			$amount = '309.99';	 //fix for empty request to the dotpay api 
+		}
+
+
         $script = [
             'sellerAccountId' => $this->config->getId(),
-            'amount' => $this->transaction->getPayment()->getAmount(),
-            'currency' => $this->transaction->getPayment()->getCurrency(),
-            'lang' => $this->transaction->getCustomer()->getLanguage(),
-            'widgetFormContainerClass' => $config::WIDGET_CLASS_CONTAINER,
+            'amount' => (string) $amount,
+            'currency' => (string) $this->transaction->getPayment()->getCurrency(),
+            'lang' => (string) $this->transaction->getCustomer()->getLanguage(),
+            'widgetFormContainerClass' => (string) $config::WIDGET_CLASS_CONTAINER,
             'offlineChannel' => 'mark',
             'offlineChannelTooltip' => true,
             'disabledChannels' => $disableChanels,
-            'host' => $this->config->getPaymentUrl().'payment_api/channels/',
+            'host' => $this->config->getPaymentUrl().'payment_api/v1/channels/',
         ];
 
         return new Script(new PlainText('var dotpayWidgetConfig = '.json_encode($script).';'));
