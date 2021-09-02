@@ -229,9 +229,9 @@ class Request
             $amount = '8.88'; // sample value, not null
         }
 
-        return 'id='.$this->getSellerId().
+        return 'currency='.$this->getCurrency().
+               '&id='.$this->getSellerId().
                '&amount='.$amount. //fix for empty request to the dotpay api
-               '&currency='.$this->getCurrency().
                '&lang='.$this->getLanguage().
                '&format='.$this->getFormat();
     }

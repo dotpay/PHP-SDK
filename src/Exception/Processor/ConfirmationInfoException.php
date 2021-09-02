@@ -35,5 +35,5 @@ class ConfirmationInfoException extends \Dotpay\Exception\DotpayException
     /**
      * Message of error thrown by the exception.
      */
-    const MESSAGE = 'Information about shop configuration which can be caught and displayed';
+    const MESSAGE = 'Access denied: %1';
 }

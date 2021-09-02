@@ -95,23 +95,28 @@ class Diagnostics
     public function execute()
     {
         $config = $this->config;
+
+        if( (int)$config->getNonProxyMode() == 1) {
+            $clientIp = $_SERVER['REMOTE_ADDR'];
+            $proxy_desc = 'FALSE';
+        }else{
+            $clientIp = IpDetector::detect($this->config);
+            $proxy_desc = 'TRUE';
+        }
+
        // if ((IpDetector::detect($this->config) == $config::OFFICE_IP ||  $_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP) && $_SERVER['REQUEST_METHOD'] == 'GET')
          
-        if (
-            (
-                ( ((int)$config->getNonProxyMode() == 1) && ($_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP) ) || 
-                ( ((int)$config->getNonProxyMode() != 1) && (IpDetector::detect($this->config) == $config::OFFICE_IP))
-
-             ) && $_SERVER['REQUEST_METHOD'] == 'GET'
-           ) 
+       if ( (strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($clientIp == $config::OFFICE_IP) ) 
         
         {
             $this->completeInformations();
 
             die($this->outputMessage);
-            //throw new ConfirmationInfoException($this->outputMessage);
-        }
-        else {
+
+        } else if((strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($clientIp != $config::OFFICE_IP)) {
+            throw new ConfirmationInfoException('IP: '.IpDetector::detect($this->config).'/'.$_SERVER['REMOTE_ADDR'].', PROXY: '.$proxy_desc.', METHOD: '.$_SERVER['REQUEST_METHOD']);
+
+         } else {
             return false;
         }
     }
@@ -207,22 +212,20 @@ class Diagnostics
     protected function checkIp()
     {
         $config = $this->config;
-        if (
-            /*
-            !(
-                (IpDetector::isAllowedIp(IpDetector::detect($this->config), $config::DOTPAY_CALLBACK_IP_WHITE_LIST)) || 
-               IpDetector::detect($this->config) == $config::OFFICE_IP
-            )
-            */    
-            !(
-                (((int)$config->getNonProxyMode() == 1) && (IpDetector::isAllowedIp($_SERVER['REMOTE_ADDR'], $config::DOTPAY_CALLBACK_IP_WHITE_LIST))) || 
-                ( ( (int)$config->getNonProxyMode() != 1) && (IpDetector::isAllowedIp($clientIp, $config::DOTPAY_CALLBACK_IP_WHITE_LIST)))
 
-             )
+        if( (int)$config->getNonProxyMode() == 1) {
+            $clientIp = $_SERVER['REMOTE_ADDR'];
+            $proxy_desc = 'FALSE';
+        }else{
+            $clientIp = IpDetector::detect($this->config);
+            $proxy_desc = 'TRUE';
+        }
 
+        if ( 
+            !( IpDetector::isAllowedIp($clientIp, $config::DOTPAY_CALLBACK_IP_WHITE_LIST) )
            ) 
         {
-            throw new ConfirmationDataException('ERROR (REMOTE ADDRESS: '.IpDetector::detect($this->config).')');
+            throw new ConfirmationDataException('ERROR (REMOTE ADDRESS: '.$clientIp.'/'.$_SERVER['REMOTE_ADDR'].', PROXY:'.$proxy_desc.')');
         }
 
         return true;
@@ -265,10 +268,10 @@ class Diagnostics
                 ) {
                     return new Seller($this->config->getFccId(), $this->config->getFccPin(), $this->config->getTestMode());
                 } else {
-                    throw new SellerNotRecognizedException($this->notification->getAccountId());
+                    throw new SellerNotRecognizedException($this->notification->getOperation()->getAccountId());
                 }
             default:
-                throw new SellerNotRecognizedException($this->notification->getAccountId());
+                throw new SellerNotRecognizedException($this->notification->getOperation()->getAccountId());
         }
     }
 }
