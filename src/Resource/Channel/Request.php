@@ -274,7 +274,7 @@ class Request
     public function setSellerId($sellerId)
     {
         if (!Id::validate($sellerId)) {
-            throw new IdException($sellerId);
+           // throw new IdException($sellerId);
         }
         $this->sellerId = (int) $sellerId;
 

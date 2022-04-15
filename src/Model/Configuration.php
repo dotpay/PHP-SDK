@@ -49,7 +49,7 @@ class Configuration
     /**
      * Version of the SDK.
      */
-    const SDK_VERSION = '1.0.19';
+    const SDK_VERSION = '1.0.20';
 
     const DOTPAY_SSL_URL = 'https://ssl.dotpay.pl';
 
@@ -413,7 +413,7 @@ class Configuration
      */
     public function getId()
     {
-        return $this->id;
+        return (string) $this->id;
     }
 
     /**
@@ -975,7 +975,7 @@ class Configuration
     public function setId($id)
     {
         if (!Id::validate($id) && ($this->getEnable() || !empty($id))) {
-            $this->addError(new IdException($id));
+            $this->addError(new IdException($id)); 
             return $this;
         }
         $this->id = (int) $id;

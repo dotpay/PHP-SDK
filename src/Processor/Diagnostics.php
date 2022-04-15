@@ -83,8 +83,35 @@ class Diagnostics
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
 		$productMetadata = $objectManager->get('Magento\Framework\App\ProductMetadataInterface'); 
+        $request = $objectManager->get('Magento\Framework\App\Request\Http');  
 		$this->MagentoVersion = $productMetadata->getVersion();
+		$this->get_dp_debug = $request->getParam('dp_debug');
+
+        $storeManager = $objectManager->get('\Magento\Store\Model\StoreManagerInterface');
+        $this->MagentoUrl =  $this->getHost($storeManager->getStore()->getBaseUrl());
+
+
     }
+
+
+    /**
+     * Parsing domain from a URL
+     */
+    protected function getHost($url) { 
+        $parseUrl = parse_url(trim($url)); 
+        if(isset($parseUrl['host']))
+        {
+            $host = $parseUrl['host'];
+        }
+        else
+        {
+             $path = explode('/', $parseUrl['path']);
+             $host = $path[0];
+        }
+        return trim($host); 
+     }
+
+
 
     /**
      * Execute the processor for making all confirmation's activities.
@@ -95,6 +122,7 @@ class Diagnostics
     public function execute()
     {
         $config = $this->config;
+        $dp_debug_allow = false;
 
         if( (int)$config->getNonProxyMode() == 1) {
             $clientIp = $_SERVER['REMOTE_ADDR'];
@@ -103,29 +131,46 @@ class Diagnostics
             $clientIp = IpDetector::detect($this->config);
             $proxy_desc = 'TRUE';
         }
-
-       // if ((IpDetector::detect($this->config) == $config::OFFICE_IP ||  $_SERVER['REMOTE_ADDR'] == $config::OFFICE_IP) && $_SERVER['REQUEST_METHOD'] == 'GET')
-         
-       if ( (strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($clientIp == $config::OFFICE_IP) ) 
         
+
+        $string_to_hash = 'h:'.$this->MagentoUrl.',id:'.$config->getId().',d:'.date('YmdHi').',p:'.$config->getPin();
+        $dp_debug_hash = hash('sha256', $string_to_hash);
+
+
+        if( isset($this->get_dp_debug) && trim($this->get_dp_debug) == $dp_debug_hash ) {
+            $dp_debug_allow = true;
+        }else{
+            $dp_debug_allow = false;
+        }
+
+       if ( (strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($clientIp == $config::OFFICE_IP || $dp_debug_allow == true) ) 
         {
             $this->completeInformations();
-
             die($this->outputMessage);
 
-        } else if((strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($clientIp != $config::OFFICE_IP)) {
-            throw new ConfirmationInfoException('IP: '.IpDetector::detect($this->config).'/'.$_SERVER['REMOTE_ADDR'].', PROXY: '.$proxy_desc.', METHOD: '.$_SERVER['REQUEST_METHOD']);
+        //only FOR DOTPAY DEBUG SYSTEM
+        } else if(isset($this->get_dp_debug) && $this->get_dp_debug == "time" && (strtoupper($_SERVER['REQUEST_METHOD']) == 'GET'))
+        {
+                $this->addOutputMessage('IP: '.IpDetector::detect($this->config).'/'.$_SERVER['REMOTE_ADDR'].', PROXY: '.$proxy_desc.', METHOD: '.$_SERVER['REQUEST_METHOD'].", TIME: ".date('YmdHi'), true);
+                die($this->outputMessage);
+        } 
+        /*
+                else if ((strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($clientIp != $config::OFFICE_IP) && (!isset($this->get_dp_debug) || $this->get_dp_debug != "time") ) 
+                {
+                    $this->addOutputMessage('IP: '.IpDetector::detect($this->config).'/'.$_SERVER['REMOTE_ADDR'].', PROXY: '.$proxy_desc.', METHOD: '.$_SERVER['REQUEST_METHOD']);
+                    die($this->outputMessage);
 
-         } else {
+                } 
+        */
+        else {
             return false;
         }
     }
 
     protected function DotpayModuleInfo()
     {
-                return $this->pluginInfo;
-
-        }
+        return $this->pluginInfo;
+    }
 
     /**
      * Collect informations about shop which can be displayed for diagnostic.
@@ -136,7 +181,8 @@ class Diagnostics
 
         $this->addOutputMessage('--- Platform Information ---')
 		->addOutputMessage('Magento Version: '.$this->MagentoVersion)
-        ->addOutputMessage('PHP Version: '.  phpversion());
+        ->addOutputMessage('PHP Version: '.  phpversion())
+        ->addOutputMessage('Server datetime: '. date('YmdHi'));
         
         $this->addOutputMessage('<br><br>--- Dotpay Diagnostic Information ---')
             ->addOutputMessage('Sdk Version: '.$config::SDK_VERSION);
@@ -151,11 +197,12 @@ class Diagnostics
             ->addOutputMessage('Correct Pin: '.(int) $this->sellerApi->checkPin())
             ->addOutputMessage('API Version: '.$config->getApi())
             ->addOutputMessage('Test Mode: '.(int) $config->getTestMode())
+            ->addOutputMessage('Hostname: '.$this->MagentoUrl)
             ->addOutputMessage('Not uses Proxy Mode: '.(int) $config->getNonProxyMode())
             ->addOutputMessage('Refunds: '.(int) $config->getRefundsEnable())
             ->addOutputMessage('Widget: '.(int) $config->getWidgetVisible())
             ->addOutputMessage('Widget currencies: '.$config->getWidgetCurrencies())
-            ->addOutputMessage('Control field with additional information (default): '.$config->getControlDefault())
+            ->addOutputMessage('Control field with NO additional information (default): '.$config->getControlDefault())
             ->addOutputMessage('Instructions: '.(int) $config->getInstructionVisible(), true)
             ->addOutputMessage('Store Name from: '.$config->getStoreName())
             ->addOutputMessage('Store Email from: '.$config->getStoreEmail())
@@ -174,7 +221,7 @@ class Diagnostics
             ->addOutputMessage('--- REMOTE_ADDRESS ---')
             ->addOutputMessage('$_SERVER[\'REMOTE_ADDR\'] : '.$_SERVER['REMOTE_ADDR'])
             ->addOutputMessage('--- Dotpay API ---')
-            ->addOutputMessage('Data: '.(($config->isGoodApiData()) ? '&lt;given&gt;' : '&lt;empty&gt;'))
+            ->addOutputMessage('Username and password are not empty: '.(($config->isGoodApiData()) ? '&lt;not empty&gt;' : '&lt;empty&gt;'))
             ->addOutputMessage('Login: '.$config->getUsername());
         try {
             $isAccountRight = $this->sellerApi->isAccountRight();
