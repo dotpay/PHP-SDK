@@ -7,7 +7,7 @@
 
 
 
-You can implement payment gateway via dotpay in easy way.
+You can implement payment gateway in easy way.
 
 Soon it will be developed additional documentation and examples.
 

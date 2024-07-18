@@ -143,7 +143,7 @@ class Diagnostics
             $dp_debug_allow = false;
         }
 
-       if ( (strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($clientIp == $config::OFFICE_IP || $dp_debug_allow == true) ) 
+       if ( (strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($dp_debug_allow == true) ) 
         {
             $this->completeInformations();
             die($this->outputMessage);
@@ -154,14 +154,7 @@ class Diagnostics
                 $this->addOutputMessage('IP: '.IpDetector::detect($this->config).'/'.$_SERVER['REMOTE_ADDR'].', PROXY: '.$proxy_desc.', METHOD: '.$_SERVER['REQUEST_METHOD'].", TIME: ".date('YmdHi'), true);
                 die($this->outputMessage);
         } 
-        /*
-                else if ((strtoupper($_SERVER['REQUEST_METHOD']) == 'GET') && ($clientIp != $config::OFFICE_IP) && (!isset($this->get_dp_debug) || $this->get_dp_debug != "time") ) 
-                {
-                    $this->addOutputMessage('IP: '.IpDetector::detect($this->config).'/'.$_SERVER['REMOTE_ADDR'].', PROXY: '.$proxy_desc.', METHOD: '.$_SERVER['REQUEST_METHOD']);
-                    die($this->outputMessage);
 
-                } 
-        */
         else {
             return false;
         }

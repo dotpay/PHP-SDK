@@ -49,14 +49,14 @@ class Configuration
     /**
      * Version of the SDK.
      */
-    const SDK_VERSION = '1.0.20';
+    const SDK_VERSION = '1.0.21';
 
     const DOTPAY_SSL_URL = 'https://ssl.dotpay.pl';
 
     /**
      * Url of Dotpay payment production server.
      */
-    const PAYMENT_URL_PROD = 'https://ssl.dotpay.pl/t2/';
+    const PAYMENT_URL_PROD = 'https://dproxy.przelewy24.pl/t2/';
 
     /**
      * Url of Dotpay payment test server.
@@ -66,7 +66,7 @@ class Configuration
     /**
      * Url of Dotpay seller production server.
      */
-    const SELLER_URL_PROD = 'https://ssl.dotpay.pl/s2/login/';
+    const SELLER_URL_PROD = 'https://dproxy.przelewy24.pl/s2/login/';
 
     /**
      * Url of Dotpay seller test server.
@@ -76,22 +76,15 @@ class Configuration
     /**
      * Addresses IP of Dotpay confirmation server.
      */
-    //const CALLBACK_IP = '195.150.9.37';
+    //
 
     const DOTPAY_CALLBACK_IP_WHITE_LIST = array(
                                                 '195.150.9.37',
-                                                '91.216.191.181',
-                                                '91.216.191.182',
-                                                '91.216.191.183',
-                                                '91.216.191.184',
-                                                '91.216.191.185',
+                                                '5.252.202.254',
                                                 '5.252.202.255',
+                                                '20.215.81.124'
                                                 );
 
-    /**
-     * Address IP od Dotpay office.
-     */
-    const OFFICE_IP = '77.79.195.34';
 
     /**
      * Address IP of the localhost.

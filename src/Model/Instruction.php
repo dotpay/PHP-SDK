@@ -53,12 +53,12 @@ class Instruction
     /**
      * Street of the recipient of payment.
      */
-    const RECIPIENT_STREET = 'ul. Kanclerska 15';
+    const RECIPIENT_STREET = 'ul. Pastelowa 8';
 
     /**
      * Post code and city of the recipient of payment.
      */
-    const RECIPIENT_CITY = '60-327 Poznań';
+    const RECIPIENT_CITY = '60-198 Poznań';
 
     /**
      * @var int|null Id of the instruction in a shop
